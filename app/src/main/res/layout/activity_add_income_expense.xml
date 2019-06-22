@@ -5,21 +5,21 @@
 
     <data>
         <variable
-            name="incExpString"
+            name="isBucksIncome"
             type="boolean" />
     </data>
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context="com.chaitupenjudcoder.AddIncomeActivity">
+        tools:context="com.chaitupenjudcoder.AddIncomeExpenseActivity">
 
         <TextView
             android:id="@+id/tv_add_income"
             style="@style/TextAppearance.AppCompat.Caption"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{}"
+            android:text="@{isBucksIncome ? @string/textview_add_income : @string/textview_add_expense}"
             android:textColor="#000"
             android:textSize="30sp"
             android:textStyle="bold"

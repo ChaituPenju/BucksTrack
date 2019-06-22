@@ -10,21 +10,25 @@ import android.widget.Toast;
 
 import com.chaitupenjudcoder.buckstrack.R;
 import com.chaitupenjudcoder.buckstrack.databinding.ActivitySignUpBinding;
+import com.chaitupenjudcoder.datapojos.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.concurrent.TimeUnit;
 
 public class SignUpActivity extends AppCompatActivity {
 
     ActivitySignUpBinding signupUtil;
     private FirebaseAuth mAuth;
     private FirebaseDatabase mDatabase;
-    private DatabaseReference mReference;
+    private DatabaseReference mReference1, mReference2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +36,10 @@ public class SignUpActivity extends AppCompatActivity {
         signupUtil = DataBindingUtil.setContentView(this, R.layout.activity_sign_up);
         mAuth = FirebaseAuth.getInstance();
         mDatabase = FirebaseDatabase.getInstance();
-        mReference = mDatabase.getReference("users");
+        //reference to users json
+        mReference1 = mDatabase.getReference("users");
+        //reference to data json
+        mReference2 = mDatabase.getReference("data");
         signupUtil.btnSignup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -68,6 +75,18 @@ public class SignUpActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
                     FirebaseUser user = mAuth.getCurrentUser();
+                    String userID = user.getUid();
+                    //get user display name
+                    String displayName = signupUtil.etFullname.getText().toString();
+                    //set user display name
+                    UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder().setDisplayName(displayName).build();
+                    //update user profile
+                    user.updateProfile(profileUpdates);
+                    Long tsLong = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis());
+                    String ts = tsLong.toString();
+                    User userObj = new User(signupUtil.etEmail.getText().toString(), signupUtil.etFullname.getText().toString(), ts, ts);
+                    mReference1.child(userID).setValue(userObj);
+                    mReference2.push().child(userID).child("spendings");
                     Toast.makeText(SignUpActivity.this, "SignUp Successful", Toast.LENGTH_SHORT).show();
                 } else {
                     if (task.getException() instanceof FirebaseAuthUserCollisionException) {

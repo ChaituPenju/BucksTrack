@@ -10,7 +10,7 @@ import android.widget.Toast;
 
 import com.chaitupenjudcoder.buckstrack.R;
 import com.chaitupenjudcoder.buckstrack.databinding.ActivityBucksTransactionsBinding;
-import com.chaitupenjudcoder.datapojos.AddIncomeExpense;
+import com.chaitupenjudcoder.datapojos.IncomeExpense;
 import com.chaitupenjudcoder.recyclerviews.BucksTransactionsRecycler;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -25,7 +25,7 @@ public class BucksTransactions extends AppCompatActivity {
     ActivityBucksTransactionsBinding transactionUtil;
     FirebaseDatabase dbTransactions;
     DatabaseReference transacRef;
-    ArrayList<AddIncomeExpense> trans;
+    ArrayList<IncomeExpense> trans;
     RecyclerView transactions;
     BucksTransactionsRecycler transactionRecycler;
 
@@ -36,7 +36,7 @@ public class BucksTransactions extends AppCompatActivity {
         trans = new ArrayList<>();
         getAllTransactions(new FirebaseCallBack() {
             @Override
-            public void onCallBack(ArrayList<AddIncomeExpense> allTransactions) {
+            public void onCallBack(ArrayList<IncomeExpense> allTransactions) {
                 transactionRecycler = new BucksTransactionsRecycler(getApplicationContext(), allTransactions);
                 Toast.makeText(BucksTransactions.this, "size is :"+allTransactions.size(), Toast.LENGTH_SHORT).show();
                 Log.d("WWWWW", allTransactions.toString());
@@ -51,18 +51,18 @@ public class BucksTransactions extends AppCompatActivity {
     }
 
     private interface FirebaseCallBack {
-        void onCallBack(ArrayList<AddIncomeExpense> allTransactions);
+        void onCallBack(ArrayList<IncomeExpense> allTransactions);
     }
 
     private void getAllTransactions(final FirebaseCallBack callBack) {
         dbTransactions = FirebaseDatabase.getInstance();
-        transacRef = dbTransactions.getReference("user1");
+        transacRef = dbTransactions.getReference("data/user1");
 
         ValueEventListener postListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot incomeExpenseShot:dataSnapshot.child("spendings").getChildren()) {
-                    AddIncomeExpense expenseIncome = incomeExpenseShot.getValue(AddIncomeExpense.class);
+                    IncomeExpense expenseIncome = incomeExpenseShot.getValue(IncomeExpense.class);
                     trans.add(expenseIncome);
                 }
                 callBack.onCallBack(trans);

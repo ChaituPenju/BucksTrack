@@ -13,6 +13,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:baselineAligned="false"
             android:orientation="horizontal"
             android:padding="8dp">
 
@@ -34,11 +35,6 @@
                         android:text="hello world first half"/>
                 </LinearLayout>
 
-            <View
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="6"
-                android:background="#00ff00"/>
 
                 <LinearLayout
                     android:layout_width="0dp"

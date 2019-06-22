@@ -1,16 +1,19 @@
 package com.chaitupenjudcoder;
 
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import com.chaitupenjudcoder.buckstrack.R;
-import com.chaitupenjudcoder.buckstrack.databinding.ActivityAddIncomeBinding;
-import com.chaitupenjudcoder.datapojos.AddIncomeExpense;
+import com.chaitupenjudcoder.buckstrack.databinding.ActivityAddIncomeExpenseBinding;
+import com.chaitupenjudcoder.datapojos.IncomeExpense;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -19,22 +22,37 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
-public class AddIncomeActivity extends AppCompatActivity {
-    private static final String BUCKS_STRING = "income";
+import static com.chaitupenjudcoder.BucksActivity.BUCKS_STRING_IS_INCOME_EXTRA;
+
+public class AddIncomeExpenseActivity extends AppCompatActivity {
+
     FirebaseDatabase mDatabase;
     DatabaseReference mReference;
-    ActivityAddIncomeBinding addIncome;
-
+    FirebaseAuth mAuth;
+    FirebaseUser muser;
+    ActivityAddIncomeExpenseBinding addIncome;
+    boolean isIncome;
+    String BUCKS_STRING;
+    String uId;
     EditText title, amount, date, description;
     String titleStr, amountStr, dateStr, descriptionStr, categoryStr;
 
-    AddIncomeExpense income;
+    IncomeExpense income;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        addIncome = DataBindingUtil.setContentView(this, R.layout.activity_add_income);
+        addIncome = DataBindingUtil.setContentView(this, R.layout.activity_add_income_expense);
+        mAuth = FirebaseAuth.getInstance();
         mDatabase = FirebaseDatabase.getInstance();
-        mReference = mDatabase.getReference("data/user1/categories");
+        muser = mAuth.getCurrentUser();
+        uId = muser.getUid();
+        mReference = mDatabase.getReference("data/"+uId+"/categories");
+        Intent in = getIntent();
+        if (in.getExtras() != null && in.getExtras().containsKey(BUCKS_STRING_IS_INCOME_EXTRA)) {
+            isIncome = in.getExtras().getBoolean(BUCKS_STRING_IS_INCOME_EXTRA);
+            BUCKS_STRING = isIncome ? "income" : "expense";
+        }
+        addIncome.setIsBucksIncome(isIncome);
         title = addIncome.etTitle;
         amount = addIncome.etAmount;
         date = addIncome.etDate;
@@ -57,9 +75,9 @@ public class AddIncomeActivity extends AppCompatActivity {
         descriptionStr = description.getText().toString();
         categoryStr = (String) addIncome.spiCategories.getSelectedItem();
         //create an instance of addincomeexpense object to push
-        income = new AddIncomeExpense(titleStr, amountStr, dateStr, descriptionStr, categoryStr, BUCKS_STRING);
+        income = new IncomeExpense(titleStr, amountStr, dateStr, descriptionStr, categoryStr, BUCKS_STRING);
         //goto spendings reference
-        mReference = mDatabase.getReference("data/user1/spendings");
+        mReference = mDatabase.getReference("data/"+uId+"/spendings");
         //push the object into it
         mReference.push().setValue(income);
         String all = titleStr + " \n" + amountStr + " \n" + dateStr + " \n" + descriptionStr + " \n" + categoryStr;
@@ -75,7 +93,7 @@ public class AddIncomeActivity extends AppCompatActivity {
             ArrayList<String> categories = new ArrayList<>();
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot categorieShot:dataSnapshot.child("income").getChildren()) {
+                for (DataSnapshot categorieShot:dataSnapshot.child(BUCKS_STRING).getChildren()) {
                     String category = categorieShot.getValue(String.class);
                     categories.add(category);
                 }
@@ -85,7 +103,7 @@ public class AddIncomeActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                Toast.makeText(AddIncomeActivity.this, "something went wrong", Toast.LENGTH_SHORT).show();
+                Toast.makeText(AddIncomeExpenseActivity.this, "something went wrong", Toast.LENGTH_SHORT).show();
             }
         };
         mReference.addValueEventListener(postListener);

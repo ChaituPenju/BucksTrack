@@ -5,20 +5,19 @@ import android.databinding.DataBindingUtil;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
 import com.chaitupenjudcoder.buckstrack.R;
 import com.chaitupenjudcoder.buckstrack.databinding.ItemSpendingListBinding;
-import com.chaitupenjudcoder.datapojos.AddIncomeExpense;
+import com.chaitupenjudcoder.datapojos.IncomeExpense;
 
 import java.util.ArrayList;
 
 public class BucksTransactionsRecycler extends RecyclerView.Adapter<BucksTransactionsRecycler.BucksTransactionsAdapter> {
 
     private Context cxt;
-    private ArrayList<AddIncomeExpense> allTransactions;
-    public BucksTransactionsRecycler(Context cxt, ArrayList<AddIncomeExpense> allTransactions) {
+    private ArrayList<IncomeExpense> allTransactions;
+    public BucksTransactionsRecycler(Context cxt, ArrayList<IncomeExpense> allTransactions) {
         this.cxt = cxt;
         this.allTransactions = allTransactions;
     }
@@ -33,7 +32,7 @@ public class BucksTransactionsRecycler extends RecyclerView.Adapter<BucksTransac
 
     @Override
     public void onBindViewHolder(@NonNull BucksTransactionsAdapter bucksTransactionsAdapter, int i) {
-        AddIncomeExpense ie = allTransactions.get(i);
+        IncomeExpense ie = allTransactions.get(i);
         bucksTransactionsAdapter.itenViewBinding.tvAmount.setText(ie.getTitle());
         bucksTransactionsAdapter.itenViewBinding.tvTitle.setText(ie.getAmount());
     }

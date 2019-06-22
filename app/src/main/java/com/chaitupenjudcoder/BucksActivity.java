@@ -21,7 +21,7 @@ import android.widget.Toast;
 import com.chaitupenjudcoder.buckstrack.CategoriesActivity;
 import com.chaitupenjudcoder.buckstrack.R;
 import com.chaitupenjudcoder.buckstrack.databinding.ActivityBucksBinding;
-import com.chaitupenjudcoder.datapojos.AddIncomeExpense;
+import com.chaitupenjudcoder.datapojos.IncomeExpense;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -30,7 +30,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 public class BucksActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -44,19 +44,20 @@ public class BucksActivity extends AppCompatActivity
     FirebaseDatabase database;
     DatabaseReference myRef;
 
-    private static final String BUCKS_STRING_INCOME = "income";
-    public static final String BUCKS_STRING_INCOME_EXTRA = "income_extra";
-    private static final String BUCKS_STRING_EXPENSE = "expense";
-    private static final String BUCKS_STRING_EXPENSE_EXTRA = "expense_extra";
+    private static final boolean BUCKS_INCOME = true;
+    public static final String BUCKS_STRING_IS_INCOME_EXTRA = "income_extra";
+    private static final boolean BUCKS_EXPENSE = false;
 
     Intent addIncExp;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         bucks = DataBindingUtil.setContentView(this, R.layout.activity_bucks);
+
+        //get Firebase instance
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
-        Toast.makeText(this, "name is "+user.getUid(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "time is ", Toast.LENGTH_SHORT).show();
         Toolbar toolbar = findViewById(R.id.toolbar);
         fab1 = findViewById(R.id.fab_add_income);
         fab2 = findViewById(R.id.fab_add_expnese);
@@ -64,8 +65,8 @@ public class BucksActivity extends AppCompatActivity
             @Override
             public void onClick(View v) {
                 closeFABMenu();
-                addIncExp = new Intent(new Intent(BucksActivity.this, AddIncomeActivity.class));
-                addIncExp.putExtra(BUCKS_STRING_INCOME_EXTRA, BUCKS_STRING_INCOME);
+                addIncExp = new Intent(new Intent(BucksActivity.this, AddIncomeExpenseActivity.class));
+                addIncExp.putExtra(BUCKS_STRING_IS_INCOME_EXTRA, BUCKS_INCOME);
                 startActivity(addIncExp);
             }
         });
@@ -74,8 +75,8 @@ public class BucksActivity extends AppCompatActivity
             @Override
             public void onClick(View v) {
                 closeFABMenu();
-                addIncExp = new Intent(new Intent(BucksActivity.this, AddIncomeActivity.class));
-                addIncExp.putExtra(BUCKS_STRING_EXPENSE_EXTRA, BUCKS_STRING_EXPENSE);
+                addIncExp = new Intent(new Intent(BucksActivity.this, AddIncomeExpenseActivity.class));
+                addIncExp.putExtra(BUCKS_STRING_IS_INCOME_EXTRA, BUCKS_EXPENSE);
                 startActivity(addIncExp);
             }
         });
@@ -110,13 +111,13 @@ public class BucksActivity extends AppCompatActivity
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AddIncomeExpense myExpense = new AddIncomeExpense("title", "4000","2019-06-15", "this is test insertion", "coding", "income");
+                IncomeExpense myExpense = new IncomeExpense("title", "4000","2019-06-15", "this is test insertion", "coding", "income");
                 if (myExpense.getBucksString().equals("income")) {
                     myRef.setValue(et.getText().toString());
                 }
-                ArrayList<AddIncomeExpense> myExpenseList = new ArrayList<>();
+                ArrayList<IncomeExpense> myExpenseList = new ArrayList<>();
                 for (int i=0;i<4;i++) {
-                    myExpenseList.add(new AddIncomeExpense(myExpense.getTitle()+i, myExpense.getAmount()+i, myExpense.getDate(), myExpense.getNote()+i, myExpense.getCategory()+i, "income"));
+                    myExpenseList.add(new IncomeExpense(myExpense.getTitle()+i, myExpense.getAmount()+i, myExpense.getDate(), myExpense.getNote()+i, myExpense.getCategory()+i, "income"));
                 }
                 myExpenseList.add(myExpense);
                 myRef.child("income").setValue(myExpenseList).addOnSuccessListener(new OnSuccessListener<Void>() {

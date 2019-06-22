@@ -14,7 +14,7 @@
             android:label="@string/title_activity_categories"
             android:theme="@style/AppTheme.NoActionBar"
             android:parentActivityName="com.chaitupenjudcoder.BucksActivity"></activity>
-        <activity android:name="com.chaitupenjudcoder.AddIncomeActivity"
+        <activity android:name="com.chaitupenjudcoder.AddIncomeExpenseActivity"
             android:parentActivityName="com.chaitupenjudcoder.BucksActivity"/>
         <activity android:name="com.chaitupenjudcoder.BucksTransactions"
             android:parentActivityName="com.chaitupenjudcoder.BucksActivity"/>

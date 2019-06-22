@@ -1,6 +1,6 @@
 package com.chaitupenjudcoder.datapojos;
 
-public class AddIncomeExpense {
+public class IncomeExpense {
     private String title;
     private String amount;
     private String date;
@@ -8,10 +8,10 @@ public class AddIncomeExpense {
     private String category;
     private String bucksString;
 
-    public AddIncomeExpense() {
+    public IncomeExpense() {
     }
 
-    public AddIncomeExpense(String title, String amount, String date, String note, String category, String bucksString) {
+    public IncomeExpense(String title, String amount, String date, String note, String category, String bucksString) {
         this.title = title;
         this.amount = amount;
         this.date = date;
