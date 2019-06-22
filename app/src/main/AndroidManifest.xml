@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.chaitupenjudcoder.buckstrack">
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity
+            android:name=".CategoriesActivity"
+            android:label="@string/title_activity_categories"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:parentActivityName="com.chaitupenjudcoder.BucksActivity"></activity>
+        <activity android:name="com.chaitupenjudcoder.AddIncomeActivity"
+            android:parentActivityName="com.chaitupenjudcoder.BucksActivity"/>
+        <activity android:name="com.chaitupenjudcoder.BucksTransactions"
+            android:parentActivityName="com.chaitupenjudcoder.BucksActivity"/>
+        <activity android:name="com.chaitupenjudcoder.DateChooserActivity"
+            android:parentActivityName="com.chaitupenjudcoder.BucksActivity"/>
+        <activity
+            android:name="com.chaitupenjudcoder.BucksActivity"
+            android:label="@string/title_activity_bucks"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name="com.chaitupenjudcoder.SignUpActivity" />
+        <activity android:name="com.chaitupenjudcoder.LoginActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>

@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "738135493250",
+    "firebase_url": "https://buckstrack-d0886.firebaseio.com",
+    "project_id": "buckstrack-d0886",
+    "storage_bucket": "buckstrack-d0886.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:738135493250:android:d9e2f87270a227df",
+        "android_client_info": {
+          "package_name": "com.chaitupenjudcoder.buckstrack"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "738135493250-bdn761ubg93kre91aba7nl183rq0upca.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.chaitupenjudcoder.buckstrack",
+            "certificate_hash": "4e8032fe55d3d45fb8010ef4cb911bbb9a4a60d6"
+          }
+        },
+        {
+          "client_id": "738135493250-1fdorscc4d4iv2i044237onuro5isui7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBdOLHP1EyOc54f3y5T65VXeVGb2ejZDmk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "738135493250-1fdorscc4d4iv2i044237onuro5isui7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
