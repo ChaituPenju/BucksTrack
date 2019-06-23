@@ -3,7 +3,7 @@
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="nav_header_title">TASK BUCKS</string>
+    <string name="nav_header_title">BUCKS TRACK</string>
     <string name="nav_header_subtitle">Save Money On the Go</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
@@ -47,4 +47,30 @@
     <string name="enter_date_hint">Date</string>
     <string name="enter_description_hint">Description</string>
     <string name="enter_fullname_hint">Enter full name</string>
+    <string name="textview_balance_text">BALANCE</string>
+    <string name="textview_income_text">INCOME</string>
+    <string name="textview_expenses_text">EXPENSES</string>
+
+    //currency symbols
+    <string name="indian_currency_symbol">₹</string>
+
+    //preferences screen symbols
+    <string-array name="currency_entries">
+        <item>india</item>
+        <item>usa</item>
+        <item>france</item>
+    </string-array>
+
+    <string-array name="currency_entry_values">
+        <item>₹</item>
+        <item>$</item>
+        <item>€</item>
+    </string-array>
+    <string name="currency_summary">Select the currency symbol</string>
+
+    //widget strings
+    <string name="appwidget_text">BUCKS TRACK</string>
+    <string name="appwidget_description">Use this widget , Powered by Chaitanya Penjuri @ Bucks Track Inc.</string>
+    <string name="add_widget">Add widget</string>
+    <string name="currency_title">Currency</string>
 </resources>

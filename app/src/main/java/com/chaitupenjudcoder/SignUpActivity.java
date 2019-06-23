@@ -21,6 +21,7 @@ import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 public class SignUpActivity extends AppCompatActivity {
@@ -48,6 +49,25 @@ public class SignUpActivity extends AppCompatActivity {
         });
     }
 
+    //initialize firebase with some basic data
+    private void initFirebaseData(String userID) {
+        String[] categoriesIncome = {"salary", "loan", "lottery"};
+        String[] categoriesExpense = {"food", "travel", "shopping", "entertainment"};
+        HashMap<String, String> categories = new HashMap<>();
+        String key = "";
+        for (String category: categoriesIncome) {
+            key = mReference2.push().getKey();
+            categories.put(key, category);
+        }
+        categories.clear();
+        mReference2.child(userID).child("categories").child("income").setValue(categories);
+        for (String category: categoriesExpense) {
+            key = mReference2.push().getKey();
+            categories.put(key, category);
+        }
+        mReference2.child(userID).child("categories").child("expense").setValue(categories);
+    }
+    //form validation function
     public void userSignup() {
         String email = signupUtil.etEmail.getText().toString();
         String password = signupUtil.etPassword.getText().toString();
@@ -86,7 +106,7 @@ public class SignUpActivity extends AppCompatActivity {
                     String ts = tsLong.toString();
                     User userObj = new User(signupUtil.etEmail.getText().toString(), signupUtil.etFullname.getText().toString(), ts, ts);
                     mReference1.child(userID).setValue(userObj);
-                    mReference2.push().child(userID).child("spendings");
+                    initFirebaseData(userID);
                     Toast.makeText(SignUpActivity.this, "SignUp Successful", Toast.LENGTH_SHORT).show();
                 } else {
                     if (task.getException() instanceof FirebaseAuthUserCollisionException) {

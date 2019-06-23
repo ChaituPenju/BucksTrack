@@ -14,31 +14,98 @@
         tools:context="com.chaitupenjudcoder.BucksActivity"
         tools:showIn="@layout/app_bar_bucks">
 
-        <EditText
-            android:id="@+id/et_firebase"
-            android:layout_width="183dp"
-            android:layout_height="41dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginTop="100dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginRight="8dp"
-            android:hint="enter some text here"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.498"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <Button
-            android:id="@+id/btn_firebase"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/ll_balance_amount"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="160dp"
-            android:layout_marginLeft="160dp"
-            android:layout_marginTop="48dp"
-            android:text="Button"
+            android:layout_marginStart="0dp"
+            android:layout_marginLeft="0dp"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/et_firebase" />
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                style="@style/TextAppearance.AppCompat.Display1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/textview_balance_text"
+                android:textColor="#2196F3" />
+
+            <TextView
+                android:id="@+id/tv_balance_amount"
+                style="@style/TextAppearance.AppCompat.Large"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:paddingBottom="8dp"
+                android:text="@string/indian_currency_symbol" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="4dp"
+                android:background="#000" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/ll_balance_amount">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/TextAppearance.AppCompat.Large"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/textview_income_text"
+                    android:textColor="#4CAF50" />
+
+                <TextView
+                    android:id="@+id/tv_income_amount"
+                    style="@style/TextAppearance.AppCompat.Title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/indian_currency_symbol" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.025"
+                android:background="#000" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/TextAppearance.AppCompat.Large"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/textview_expenses_text"
+                    android:textColor="#F44336" />
+
+                <TextView
+                    android:id="@+id/tv_expense_amount"
+                    style="@style/TextAppearance.AppCompat.Title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/indian_currency_symbol" />
+            </LinearLayout>
+        </LinearLayout>
 
 
     </android.support.constraint.ConstraintLayout>

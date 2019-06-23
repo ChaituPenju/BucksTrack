@@ -17,6 +17,7 @@ public class BucksTransactionsRecycler extends RecyclerView.Adapter<BucksTransac
 
     private Context cxt;
     private ArrayList<IncomeExpense> allTransactions;
+
     public BucksTransactionsRecycler(Context cxt, ArrayList<IncomeExpense> allTransactions) {
         this.cxt = cxt;
         this.allTransactions = allTransactions;
@@ -33,8 +34,11 @@ public class BucksTransactionsRecycler extends RecyclerView.Adapter<BucksTransac
     @Override
     public void onBindViewHolder(@NonNull BucksTransactionsAdapter bucksTransactionsAdapter, int i) {
         IncomeExpense ie = allTransactions.get(i);
-        bucksTransactionsAdapter.itenViewBinding.tvAmount.setText(ie.getTitle());
-        bucksTransactionsAdapter.itenViewBinding.tvTitle.setText(ie.getAmount());
+        bucksTransactionsAdapter.itenViewBinding.tvAmount.setText(ie.getAmount());
+        bucksTransactionsAdapter.itenViewBinding.tvTitle.setText(ie.getTitle());
+        bucksTransactionsAdapter.itenViewBinding.tvCategory.setText(ie.getCategory());
+        bucksTransactionsAdapter.itenViewBinding.tvDate.setText(ie.getDate());
+        bucksTransactionsAdapter.itenViewBinding.tvDescription.setText(ie.getNote());
     }
 
     @Override
@@ -42,9 +46,10 @@ public class BucksTransactionsRecycler extends RecyclerView.Adapter<BucksTransac
         return allTransactions.size();
     }
 
-    public class BucksTransactionsAdapter extends RecyclerView.ViewHolder {
-        public ItemSpendingListBinding itenViewBinding;
-        public BucksTransactionsAdapter(@NonNull ItemSpendingListBinding itemViewBinding) {
+    class BucksTransactionsAdapter extends RecyclerView.ViewHolder {
+        ItemSpendingListBinding itenViewBinding;
+
+        BucksTransactionsAdapter(@NonNull ItemSpendingListBinding itemViewBinding) {
             super(itemViewBinding.getRoot());
             this.itenViewBinding = itemViewBinding;
         }

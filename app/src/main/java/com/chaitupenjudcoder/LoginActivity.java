@@ -15,12 +15,14 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.concurrent.TimeUnit;
 
 public class LoginActivity extends AppCompatActivity {
 
     ActivityLoginBinding loginUtil;
     private FirebaseAuth mAuth;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,7 +46,7 @@ public class LoginActivity extends AppCompatActivity {
             startActivity(in);
         }
     }
-
+    //login
     private void userLogin() {
         loginUtil.etEmail.setText("chaitanyapenjurilanded95@gmail.com");
         loginUtil.etPassword.setText("firebase");
@@ -56,6 +58,14 @@ public class LoginActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            //get current user uid
+                            String userID = user.getUid();
+                            //get current time in seconds
+                            Long tsLong = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis());
+                            String ts = tsLong.toString();
+                            //update the last login id to latest value
+                            FirebaseDatabase.getInstance().getReference("users/"+userID).child("last_login").setValue(ts);
                             finish();
                             Intent in = new Intent(LoginActivity.this, BucksActivity.class);
                             in.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
