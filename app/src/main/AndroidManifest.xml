@@ -9,8 +9,11 @@
         android:roundIcon="@mipmap/ic_app_icon_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="com.chaitupenjudcoder.SettingsActivity"
+        <activity android:name=".CategoriesActivity"
             android:parentActivityName="com.chaitupenjudcoder.BucksActivity"/>
+        <activity
+            android:name="com.chaitupenjudcoder.SettingsActivity"
+            android:parentActivityName="com.chaitupenjudcoder.BucksActivity" />
 
         <receiver android:name=".BucksTrackWidget">
             <intent-filter>
@@ -22,11 +25,6 @@
                 android:resource="@xml/bucks_track_widget_info" />
         </receiver>
 
-        <activity
-            android:name=".CategoriesActivity"
-            android:label="@string/title_activity_categories"
-            android:parentActivityName="com.chaitupenjudcoder.BucksActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name="com.chaitupenjudcoder.AddIncomeExpenseActivity"
             android:parentActivityName="com.chaitupenjudcoder.BucksActivity" />
