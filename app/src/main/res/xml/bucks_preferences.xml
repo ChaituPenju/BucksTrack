@@ -1,11 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:title="@string/pref_screen_category_title_settings">
+        <ListPreference
+            android:key="@string/pref_screen_currency_key_name"
+            android:title="@string/currency_title"
+            android:entries="@array/currency_entries"
+            android:entryValues="@array/currency_entry_values"
+            android:summary="@string/currency_summary"
+            android:defaultValue="@string/currency_default_value"/>
 
-    <ListPreference
-        android:key="currency_key"
-        android:title="@string/currency_title"
-        android:entries="@array/currency_entries"
-        android:entryValues="@array/currency_entry_values"
-        android:summary="@string/currency_summary"/>
+        <ListPreference
+            android:key="@string/pref_screen_date_format_name"
+            android:title="@string/date_format_text"
+            android:entries="@array/date_entries"
+            android:entryValues="@array/date_entry_values"
+            android:summary="@string/date_summary"
+            android:defaultValue="@string/date_format_default_value"/>
+    </PreferenceCategory>
 
+    <PreferenceCategory
+        android:title="@string/pref_screen_category_title_login">
+        <Preference
+            android:key="last_login_key"
+            android:title="Last Login"
+            android:summary="Last Login : "
+            />
+    </PreferenceCategory>
 </PreferenceScreen>

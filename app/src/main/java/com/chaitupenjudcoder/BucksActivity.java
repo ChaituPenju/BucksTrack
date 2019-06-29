@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -55,7 +56,7 @@ public class BucksActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         bucks = DataBindingUtil.setContentView(this, R.layout.activity_bucks);
-
+        PreferenceManager.setDefaultValues(this, R.xml.bucks_preferences, true);
 
         //get Firebase authentication instance and user
         mAuth = FirebaseAuth.getInstance();
@@ -117,8 +118,6 @@ public class BucksActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         //get database instance and reference
-
-
         setTotalIncomeAndExpense();
     }
 
