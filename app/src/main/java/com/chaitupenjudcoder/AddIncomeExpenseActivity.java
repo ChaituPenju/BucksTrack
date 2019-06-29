@@ -1,11 +1,13 @@
 package com.chaitupenjudcoder;
 
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -21,6 +23,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import static com.chaitupenjudcoder.BucksActivity.BUCKS_STRING_IS_INCOME_EXTRA;
 
@@ -57,6 +60,14 @@ public class AddIncomeExpenseActivity extends AppCompatActivity {
         amount = addIncome.etAmount;
         date = addIncome.etDate;
         description = addIncome.etDescription;
+
+        date.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //initialize date picker dialog with current date and update selected date
+                initDatePickerDialog();
+            }
+        });
         getAllCategories(new activitiesCallback() {
             @Override
             public void mCallback(ArrayList<String> categories) {
@@ -66,6 +77,21 @@ public class AddIncomeExpenseActivity extends AppCompatActivity {
                 addIncome.spiCategories.setAdapter(cats);
             }
         });
+    }
+
+    private void initDatePickerDialog() {
+        final Calendar c = Calendar.getInstance();
+        int mYear = c.get(Calendar.YEAR);
+        int mMonth = c.get(Calendar.MONTH);
+        int mDay = c.get(Calendar.DAY_OF_MONTH);
+
+        DatePickerDialog dialog = new DatePickerDialog(AddIncomeExpenseActivity.this, new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                date.setText(getResources().getString(R.string.date_format_string, dayOfMonth ,(month + 1), year));
+            }
+        }, mYear, mMonth, mDay);
+        dialog.show();
     }
 
     public void saveIncomeData(View view) {

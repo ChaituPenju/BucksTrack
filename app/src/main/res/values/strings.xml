@@ -24,10 +24,6 @@
 
     <string name="title_activity_categories">CategoriesActivity</string>
 
-    <!-- user categories tab strings -->
-    <string name="tab_text_1">Expense Categories</string>
-    <string name="tab_text_2">Income Categories</string>
-
     <!-- user login activity hints -->
     <string name="user_login">LOGIN</string>
     <string name="enter_email_hint">Enter Email</string>
@@ -52,7 +48,10 @@
     <string name="textview_expenses_text">EXPENSES</string>
 
     //currency symbols
-    <string name="indian_currency_symbol">₹</string>
+    <string name="indian_currency_symbol">₹ %1$d</string>
+
+    //date string with day and month padded zero on left for 1 digit
+    <string name="date_format_string">%1$02d-%2$02d-%3$d</string>
 
     //preferences screen symbols
     <string-array name="currency_entries">
@@ -73,4 +72,6 @@
     <string name="appwidget_description">Use this widget , Powered by Chaitanya Penjuri @ Bucks Track Inc.</string>
     <string name="add_widget">Add widget</string>
     <string name="currency_title">Currency</string>
+    <string name="add_income_fab_text">Add Income</string>
+    <string name="add_expense_fab_text">Add Expense</string>
 </resources>

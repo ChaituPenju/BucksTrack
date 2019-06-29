@@ -1,10 +1,10 @@
 package com.chaitupenjudcoder;
 
 import android.content.Intent;
+import android.content.res.Resources;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -19,6 +19,7 @@ import android.widget.TextView;
 import com.chaitupenjudcoder.buckstrack.CategoriesActivity;
 import com.chaitupenjudcoder.buckstrack.R;
 import com.chaitupenjudcoder.buckstrack.databinding.ActivityBucksBinding;
+import com.github.clans.fab.FloatingActionMenu;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserInfo;
@@ -31,7 +32,8 @@ import com.google.firebase.database.ValueEventListener;
 public class BucksActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     boolean isFABOpen;
-    FloatingActionButton fab1, fab2;
+    com.github.clans.fab.FloatingActionButton incomeFab, expenseFab;
+    FloatingActionMenu fab;
     ActivityBucksBinding bucks;
 
     FirebaseAuth mAuth;
@@ -66,23 +68,23 @@ public class BucksActivity extends AppCompatActivity
 //        Toast.makeText(this, "time is " + user.getDisplayName(), Toast.LENGTH_SHORT).show();
         Toolbar toolbar = findViewById(R.id.toolbar);
         //floating action buttons for income and expense adding activities
-        fab1 = findViewById(R.id.fab_add_income);
-        fab2 = findViewById(R.id.fab_add_expnese);
+        incomeFab = findViewById(R.id.fab_add_income);
+        expenseFab = findViewById(R.id.fab_add_expnese);
         //fab on click listeners, opens same activity and changes title and data insertion of activity based on fab selection
-        fab1.setOnClickListener(new View.OnClickListener() {
+        incomeFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                closeFABMenu();
+                fab.close(true);
                 addIncExp = new Intent(new Intent(BucksActivity.this, AddIncomeExpenseActivity.class));
                 addIncExp.putExtra(BUCKS_STRING_IS_INCOME_EXTRA, BUCKS_INCOME);
                 startActivity(addIncExp);
             }
         });
 
-        fab2.setOnClickListener(new View.OnClickListener() {
+        expenseFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                closeFABMenu();
+                fab.close(true);
                 addIncExp = new Intent(new Intent(BucksActivity.this, AddIncomeExpenseActivity.class));
                 addIncExp.putExtra(BUCKS_STRING_IS_INCOME_EXTRA, BUCKS_EXPENSE);
                 startActivity(addIncExp);
@@ -90,17 +92,7 @@ public class BucksActivity extends AppCompatActivity
         });
 
         setSupportActionBar(toolbar);
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (!isFABOpen) {
-                    showFABMenu();
-                } else {
-                    closeFABMenu();
-                }
-            }
-        });
+        fab = findViewById(R.id.fab);
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
@@ -142,18 +134,23 @@ public class BucksActivity extends AppCompatActivity
                 String bucksStr;
                 for (DataSnapshot incomeExpenseTotal : dataSnapshot.child("spendings").getChildren()) {
                     bucksStr = incomeExpenseTotal.child("bucksString").getValue(String.class);
-                    if (bucksStr.equals("expense")) {
-                        expenseTotal += Integer.valueOf(incomeExpenseTotal.child("amount").getValue(String.class));
-                    } else if (bucksStr.equals("income")) {
-                        incomeTotal += Integer.valueOf(incomeExpenseTotal.child("amount").getValue(String.class));
+                    int amount = Integer.valueOf(incomeExpenseTotal.child("amount").getValue(String.class));
+                    if (bucksStr != null) {
+                        if (bucksStr.equals("expense")) {
+                            expenseTotal += amount;
+                        } else if (bucksStr.equals("income")) {
+                            incomeTotal += amount;
+                        }
                     }
                 }
                 balanceTotal = incomeTotal - expenseTotal;
 
                 //set all the totals to the
-                income.append(" " + incomeTotal);
-                expense.append(" " + expenseTotal);
-                balance.append(" " + balanceTotal);
+                Resources res = getResources();
+
+                income.setText(res.getString(R.string.indian_currency_symbol, incomeTotal));
+                expense.setText(res.getString(R.string.indian_currency_symbol, expenseTotal));
+                balance.setText(res.getString(R.string.indian_currency_symbol, balanceTotal));
 //                Toast.makeText(BucksActivity.this, ""+expenseTotal, Toast.LENGTH_SHORT).show();
             }
 
@@ -163,18 +160,6 @@ public class BucksActivity extends AppCompatActivity
             }
         };
         myRef.addValueEventListener(getTotals);
-    }
-
-    private void showFABMenu() {
-        isFABOpen = true;
-        fab1.animate().translationY(-getResources().getDimension(R.dimen.standard_dimen_income));
-        fab2.animate().translationY(-getResources().getDimension(R.dimen.standard_dimen_expense));
-    }
-
-    private void closeFABMenu() {
-        isFABOpen = false;
-        fab1.animate().translationY(0);
-        fab2.animate().translationY(0);
     }
 
     @Override
