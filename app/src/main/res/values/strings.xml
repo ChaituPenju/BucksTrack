@@ -102,5 +102,8 @@
     <string name="appwidget_description">Use this widget , Powered by Chaitanya Penjuri @ Bucks Track Inc.</string>
     <string name="add_widget">Add widget</string>
     <string name="currency_title">Currency</string>
+    <string name="income_categories_text">INCOME CATEGORIES</string>
+    <string name="expense_categories_list">EXPENSE CATEGORIES</string>
+    <string name="categories_button_add_text">ADD</string>
 
 </resources>

@@ -4,9 +4,11 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.widget.Toast;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 
 import com.chaitupenjudcoder.buckstrack.databinding.ActivityCategoriesBinding;
+import com.chaitupenjudcoder.recyclerviews.BucksCategoriesRecycler;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -24,6 +26,9 @@ public class CategoriesActivity extends AppCompatActivity {
     FirebaseUser mUser;
     DatabaseReference incomeExpenseRef;
 
+    RecyclerView income, expense;
+    ArrayList<String> incomeCats, expenseCats;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,6 +44,17 @@ public class CategoriesActivity extends AppCompatActivity {
 
         //retrieve the list of income and expense categories
         getIncomeExpenseCategories();
+
+        income = catBind.rvIncome;
+        expense = catBind.rvExpense;
+
+        //create and set layout manager for each RecyclerView
+        RecyclerView.LayoutManager firstLayoutManager = new LinearLayoutManager(this);
+        RecyclerView.LayoutManager secondLayoutManager = new LinearLayoutManager(this);
+
+        income.setLayoutManager(firstLayoutManager);
+        expense.setLayoutManager(secondLayoutManager);
+
     }
 
     private void getIncomeExpenseCategories() {
@@ -55,9 +71,12 @@ public class CategoriesActivity extends AppCompatActivity {
                 for (DataSnapshot expenseShot : dataSnapshot.child("expense").getChildren()) {
                     expenses.add((expenseShot.getValue(String.class)));
                 }
-                //categories activity with sample settext for testing
-                catBind.tvIncomes.setText("INCOME CATEGORIES\n"+incomes.toString());
-                catBind.tvExpenses.setText("EXPENSE CATEGORIES\n"+expenses.toString());
+                //Initializing and set adapter for each RecyclerView
+                BucksCategoriesRecycler firstAdapter = new BucksCategoriesRecycler(incomes);
+                BucksCategoriesRecycler secondAdapter = new BucksCategoriesRecycler(expenses);
+
+                income.setAdapter(firstAdapter);
+                expense.setAdapter(secondAdapter);
             }
 
             @Override

@@ -11,15 +11,23 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.chaitupenjudcoder.buckstrack.CategoriesActivity;
 import com.chaitupenjudcoder.buckstrack.R;
 import com.chaitupenjudcoder.buckstrack.databinding.ActivityBucksBinding;
+import com.chaitupenjudcoder.datapojos.CategoriesAmount;
+import com.chaitupenjudcoder.recyclerviews.BucksOverviewRecycler;
 import com.github.clans.fab.FloatingActionMenu;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -28,7 +36,10 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
 
 public class BucksActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -52,6 +63,8 @@ public class BucksActivity extends AppCompatActivity
     TextView income, expense, balance;
     Intent addIncExp;
 
+    Spinner categories;
+    RecyclerView rv_categories;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,6 +78,12 @@ public class BucksActivity extends AppCompatActivity
         income = findViewById(R.id.tv_income_amount);
         expense = findViewById(R.id.tv_expense_amount);
         balance = findViewById(R.id.tv_balance_amount);
+
+        categories = findViewById(R.id.spi_categories_choose);
+        // populate spinner function which populates with two classifications of categories
+        populateCategorySpinner();
+
+        rv_categories = findViewById(R.id.rv_categories_amount);
 
 //        Toast.makeText(this, "time is " + user.getDisplayName(), Toast.LENGTH_SHORT).show();
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -227,6 +246,80 @@ public class BucksActivity extends AppCompatActivity
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void populateCategorySpinner() {
+        final String[] categorie = {"INCOME", "EXPENSE"};
+        ArrayAdapter<String> cats = new ArrayAdapter<>(getApplication(), android.R.layout.simple_spinner_dropdown_item, categorie);
+        categories.setAdapter(cats);
+        categories.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Query categoriesIncome = FirebaseDatabase.getInstance().getReference("data/"+user.getUid()+"/categories/income");
+                Query categoriesExpense = FirebaseDatabase.getInstance().getReference("data/"+user.getUid()+"/categories/expense");
+                ValueEventListener categoryListener = new ValueEventListener() {
+                    ArrayList<String> categories = new ArrayList<>();
+
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        for (DataSnapshot incExpShot : dataSnapshot.getChildren()) {
+                            categories.add(incExpShot.getValue(String.class));
+                        }
+                        getIncomeExpenseCategoriesTotal(categories, 2144);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                };
+
+                if (position == 0) {
+                    categoriesIncome.addValueEventListener(categoryListener);
+                } else if(position == 1) {
+                    categoriesExpense.addValueEventListener(categoryListener);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+    }
+
+    private void getIncomeExpenseCategoriesTotal(final ArrayList<String> cats, final int total) {
+        Query categorySalary = FirebaseDatabase.getInstance().getReference("data/"+user.getUid()+"/spendings");
+        final ArrayList<CategoriesAmount> catAmount = new ArrayList<>();
+
+        categorySalary.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                int[] amounts = new int[4];
+                int cnt = 0;
+                String[] categories;
+                categories = cats.toArray(new String[0]);
+                for (String category: categories) {
+                    for (DataSnapshot catShot : dataSnapshot.getChildren()) {
+                        if (catShot.child("category").getValue(String.class).equals(category)) {
+                            amounts[cnt] += Integer.valueOf(catShot.child("amount").getValue(String.class));
+                        }
+                    }
+                    catAmount.add(new CategoriesAmount(category, String.valueOf(amounts[cnt]), (amounts[cnt]/total)*100));
+                    cnt++;
+                }
+                BucksOverviewRecycler overviewRecycler = new BucksOverviewRecycler(getApplicationContext(), catAmount);
+                RecyclerView.LayoutManager manager = new LinearLayoutManager(getApplicationContext());
+                rv_categories.setLayoutManager(manager);
+                rv_categories.setNestedScrollingEnabled(false);
+                rv_categories.setAdapter(overviewRecycler);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
 }
