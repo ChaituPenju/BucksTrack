@@ -27,6 +27,7 @@ import com.chaitupenjudcoder.buckstrack.CategoriesActivity;
 import com.chaitupenjudcoder.buckstrack.R;
 import com.chaitupenjudcoder.buckstrack.databinding.ActivityBucksBinding;
 import com.chaitupenjudcoder.datapojos.CategoriesAmount;
+import com.chaitupenjudcoder.firebasehelpers.FirebaseCategoriesHelper;
 import com.chaitupenjudcoder.recyclerviews.BucksOverviewRecycler;
 import com.github.clans.fab.FloatingActionMenu;
 import com.google.firebase.auth.FirebaseAuth;
@@ -51,9 +52,6 @@ public class BucksActivity extends AppCompatActivity
     FirebaseAuth mAuth;
     FirebaseUser user;
 
-    FirebaseDatabase database;
-    DatabaseReference myRef;
-
     private static final boolean BUCKS_INCOME = true;
     public static final String BUCKS_STRING_IS_INCOME_EXTRA = "income_extra";
     private static final boolean BUCKS_EXPENSE = false;
@@ -65,6 +63,8 @@ public class BucksActivity extends AppCompatActivity
 
     Spinner categories;
     RecyclerView rv_categories;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,11 +85,12 @@ public class BucksActivity extends AppCompatActivity
 
         rv_categories = findViewById(R.id.rv_categories_amount);
 
-//        Toast.makeText(this, "time is " + user.getDisplayName(), Toast.LENGTH_SHORT).show();
         Toolbar toolbar = findViewById(R.id.toolbar);
+
         //floating action buttons for income and expense adding activities
         incomeFab = findViewById(R.id.fab_add_income);
         expenseFab = findViewById(R.id.fab_add_expnese);
+
         //fab on click listeners, opens same activity and changes title and data insertion of activity based on fab selection
         incomeFab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -142,42 +143,25 @@ public class BucksActivity extends AppCompatActivity
 
     //gets the total income and expense from firebase
     private void setTotalIncomeAndExpense() {
-        database = FirebaseDatabase.getInstance();
-        myRef = database.getReference("data/" + user.getUid());
+        //  initialize categories helper class
+        final FirebaseCategoriesHelper helper = new FirebaseCategoriesHelper();
 
-        ValueEventListener getTotals = new ValueEventListener() {
+        //  Get two totals one inside the other and set them to textviews
+        helper.getCategoryTotal(new FirebaseCategoriesHelper.GetCategoryTotal() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                int incomeTotal = 0, expenseTotal = 0, balanceTotal;
-                String bucksStr;
-                for (DataSnapshot incomeExpenseTotal : dataSnapshot.child("spendings").getChildren()) {
-                    bucksStr = incomeExpenseTotal.child("bucksString").getValue(String.class);
-                    int amount = Integer.valueOf(incomeExpenseTotal.child("amount").getValue(String.class));
-                    if (bucksStr != null) {
-                        if (bucksStr.equals("expense")) {
-                            expenseTotal += amount;
-                        } else if (bucksStr.equals("income")) {
-                            incomeTotal += amount;
-                        }
+            public void categoriesTotal(final int total1) {
+                helper.getCategoryTotal(new FirebaseCategoriesHelper.GetCategoryTotal() {
+                    @Override
+                    public void categoriesTotal(int total2) {
+                        //set all the totals
+                        Resources res = getResources();
+                        income.setText(res.getString(R.string.indian_currency_symbol, total1));
+                        expense.setText(res.getString(R.string.indian_currency_symbol, total2));
+                        balance.setText(res.getString(R.string.indian_currency_symbol, total1 - total2));
                     }
-                }
-                balanceTotal = incomeTotal - expenseTotal;
-
-                //set all the totals to the
-                Resources res = getResources();
-
-                income.setText(res.getString(R.string.indian_currency_symbol, incomeTotal));
-                expense.setText(res.getString(R.string.indian_currency_symbol, expenseTotal));
-                balance.setText(res.getString(R.string.indian_currency_symbol, balanceTotal));
-//                Toast.makeText(BucksActivity.this, ""+expenseTotal, Toast.LENGTH_SHORT).show();
+                }, "expense");
             }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        };
-        myRef.addValueEventListener(getTotals);
+        }, "income");
     }
 
     @Override
@@ -252,33 +236,24 @@ public class BucksActivity extends AppCompatActivity
         final String[] categorie = {"INCOME", "EXPENSE"};
         ArrayAdapter<String> cats = new ArrayAdapter<>(getApplication(), android.R.layout.simple_spinner_dropdown_item, categorie);
         categories.setAdapter(cats);
+
+        final FirebaseCategoriesHelper categoriesHelper = new FirebaseCategoriesHelper();
         categories.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Query categoriesIncome = FirebaseDatabase.getInstance().getReference("data/"+user.getUid()+"/categories/income");
-                Query categoriesExpense = FirebaseDatabase.getInstance().getReference("data/"+user.getUid()+"/categories/expense");
-                ValueEventListener categoryListener = new ValueEventListener() {
-                    ArrayList<String> categories = new ArrayList<>();
+            public void onItemSelected(AdapterView<?> parent, View view, final int position, long id) {
 
+                categoriesHelper.getCategoryTotal(new FirebaseCategoriesHelper.GetCategoryTotal() {
                     @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        for (DataSnapshot incExpShot : dataSnapshot.getChildren()) {
-                            categories.add(incExpShot.getValue(String.class));
-                        }
-                        getIncomeExpenseCategoriesTotal(categories, 2144);
+                    public void categoriesTotal(final int total) {
+//                        Log.d("abcde", "inside categories total"+total);
+                        categoriesHelper.getAllCategories(new FirebaseCategoriesHelper.GetAllCategory() {
+                            @Override
+                            public void categories(ArrayList<String> categoriesList) {
+                                getIncomeExpenseCategoriesTotal(categoriesList, total);
+                            }
+                        }, categorie[position].toLowerCase());
                     }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                    }
-                };
-
-                if (position == 0) {
-                    categoriesIncome.addValueEventListener(categoryListener);
-                } else if(position == 1) {
-                    categoriesExpense.addValueEventListener(categoryListener);
-                }
+                }, categorie[position].toLowerCase());
             }
 
             @Override
@@ -289,23 +264,23 @@ public class BucksActivity extends AppCompatActivity
     }
 
     private void getIncomeExpenseCategoriesTotal(final ArrayList<String> cats, final int total) {
-        Query categorySalary = FirebaseDatabase.getInstance().getReference("data/"+user.getUid()+"/spendings");
+        Query categorySalary = FirebaseDatabase.getInstance().getReference("data/" + user.getUid() + "/spendings");
         final ArrayList<CategoriesAmount> catAmount = new ArrayList<>();
 
         categorySalary.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                int[] amounts = new int[4];
+                int[] amounts = new int[cats.size()];
                 int cnt = 0;
                 String[] categories;
                 categories = cats.toArray(new String[0]);
-                for (String category: categories) {
+                for (String category : categories) {
                     for (DataSnapshot catShot : dataSnapshot.getChildren()) {
                         if (catShot.child("category").getValue(String.class).equals(category)) {
                             amounts[cnt] += Integer.valueOf(catShot.child("amount").getValue(String.class));
                         }
                     }
-                    catAmount.add(new CategoriesAmount(category, String.valueOf(amounts[cnt]), (amounts[cnt]/total)*100));
+                    catAmount.add(new CategoriesAmount(category, String.valueOf(amounts[cnt]), ((float) amounts[cnt] / total) * 100));
                     cnt++;
                 }
                 BucksOverviewRecycler overviewRecycler = new BucksOverviewRecycler(getApplicationContext(), catAmount);

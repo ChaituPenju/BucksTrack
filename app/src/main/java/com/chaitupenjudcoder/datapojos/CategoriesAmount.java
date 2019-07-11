@@ -4,12 +4,12 @@ public class CategoriesAmount {
 
     private String categoryName;
     private String totalAmount;
-    private int percentage;
+    private float percentage;
 
     public CategoriesAmount() {
     }
 
-    public CategoriesAmount(String categoryName, String totalAmount, int percentage) {
+    public CategoriesAmount(String categoryName, String totalAmount, float percentage) {
         this.categoryName = categoryName;
         this.totalAmount = totalAmount;
         this.percentage = percentage;
@@ -23,7 +23,7 @@ public class CategoriesAmount {
         return totalAmount;
     }
 
-    public int getPercentage() {
+    public float getPercentage() {
         return percentage;
     }
 }

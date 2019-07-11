@@ -34,7 +34,7 @@ public class BucksOverviewRecycler extends RecyclerView.Adapter<BucksOverviewRec
         CategoriesAmount cAmount = catAmounts.get(i);
         bucksOverviewAdapter.itemViewBinding.tvCategory.setText(cAmount.getCategoryName());
         bucksOverviewAdapter.itemViewBinding.tvAmount.setText(cAmount.getTotalAmount());
-        int percentage = Integer.valueOf(cAmount.getPercentage());
+        int percentage = Math.round(cAmount.getPercentage());
         bucksOverviewAdapter.itemViewBinding.pbCategory.setProgress(percentage);
     }
 

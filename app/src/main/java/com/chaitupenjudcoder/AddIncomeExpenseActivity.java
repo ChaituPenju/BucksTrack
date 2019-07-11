@@ -14,6 +14,7 @@ import android.widget.Toast;
 import com.chaitupenjudcoder.buckstrack.R;
 import com.chaitupenjudcoder.buckstrack.databinding.ActivityAddIncomeExpenseBinding;
 import com.chaitupenjudcoder.datapojos.IncomeExpense;
+import com.chaitupenjudcoder.firebasehelpers.FirebaseCategoriesHelper;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -68,15 +69,17 @@ public class AddIncomeExpenseActivity extends AppCompatActivity {
                 initDatePickerDialog();
             }
         });
-        getAllCategories(new activitiesCallback() {
+
+        FirebaseCategoriesHelper categoryHelper = new FirebaseCategoriesHelper();
+        categoryHelper.getAllCategories(new FirebaseCategoriesHelper.GetAllCategory() {
             @Override
-            public void mCallback(ArrayList<String> categories) {
-                String[] categorie = new String[categories.size()];
-                categorie = categories.toArray(categorie);
+            public void categories(ArrayList<String> categoriesList) {
+                String[] categorie = new String[categoriesList.size()];
+                categorie = categoriesList.toArray(categorie);
                 ArrayAdapter<String> cats = new ArrayAdapter<>(getApplication(), android.R.layout.simple_spinner_dropdown_item, categorie);
                 addIncome.spiCategories.setAdapter(cats);
             }
-        });
+        }, BUCKS_STRING);
     }
 
     private void initDatePickerDialog() {
@@ -110,28 +113,4 @@ public class AddIncomeExpenseActivity extends AppCompatActivity {
         Toast.makeText(this, "String is :\n"+all, Toast.LENGTH_SHORT).show();
     }
 
-    public interface activitiesCallback{
-        void mCallback(ArrayList<String> categories);
-    }
-
-    private void getAllCategories(final activitiesCallback callback) {
-        ValueEventListener postListener = new ValueEventListener() {
-            ArrayList<String> categories = new ArrayList<>();
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot categorieShot:dataSnapshot.child(BUCKS_STRING).getChildren()) {
-                    String category = categorieShot.getValue(String.class);
-                    categories.add(category);
-                }
-                callback.mCallback(categories);
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Toast.makeText(AddIncomeExpenseActivity.this, "something went wrong", Toast.LENGTH_SHORT).show();
-            }
-        };
-        mReference.addValueEventListener(postListener);
-    }
 }
