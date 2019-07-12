@@ -2,9 +2,11 @@ package com.chaitupenjudcoder;
 
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 
 import com.chaitupenjudcoder.buckstrack.R;
 import com.chaitupenjudcoder.buckstrack.databinding.ActivityBucksTransactionsBinding;
@@ -42,10 +44,12 @@ public class BucksTransactions extends AppCompatActivity {
             @Override
             public void onCallBack(ArrayList<IncomeExpense> allTransactions) {
                 transactionRecycler = new BucksTransactionsRecycler(getApplicationContext(), allTransactions);
+
                 transactions = transactionUtil.rvTransactions;
                 LinearLayoutManager manager = new LinearLayoutManager(getApplicationContext());
                 transactions.setLayoutManager(manager);
                 transactions.setHasFixedSize(true);
+                new ItemTouchHelper(swipeToDelete(allTransactions, transactionRecycler)).attachToRecyclerView(transactions);
 //                transactions.setAdapter(transactionRecycler);
                 transactionUtil.setTransactionAdapter(transactionRecycler);
             }
@@ -54,6 +58,23 @@ public class BucksTransactions extends AppCompatActivity {
 
     private interface FirebaseCallBack {
         void onCallBack(ArrayList<IncomeExpense> allTransactions);
+    }
+
+    private ItemTouchHelper.SimpleCallback swipeToDelete(final ArrayList<IncomeExpense> list, final BucksTransactionsRecycler recycler) {
+        ItemTouchHelper.SimpleCallback callback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT|ItemTouchHelper.LEFT){
+
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder viewHolder1) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
+                list.remove(viewHolder.getAdapterPosition());
+                recycler.notifyDataSetChanged();
+            }
+        };
+        return callback;
     }
 
     private void getAllTransactions(final FirebaseCallBack callBack) {

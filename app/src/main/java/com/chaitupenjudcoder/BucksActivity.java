@@ -17,6 +17,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
@@ -44,7 +45,7 @@ import java.util.ArrayList;
 
 public class BucksActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-    boolean isFABOpen;
+
     com.github.clans.fab.FloatingActionButton incomeFab, expenseFab;
     FloatingActionMenu fab;
     ActivityBucksBinding bucks;
@@ -288,6 +289,8 @@ public class BucksActivity extends AppCompatActivity
                 rv_categories.setLayoutManager(manager);
                 rv_categories.setNestedScrollingEnabled(false);
                 rv_categories.setAdapter(overviewRecycler);
+                //  set bottom to top layout animation
+                rv_categories.setLayoutAnimation(AnimationUtils.loadLayoutAnimation(getApplicationContext(), R.anim.categorywise_card_bottom_animation));
             }
 
             @Override

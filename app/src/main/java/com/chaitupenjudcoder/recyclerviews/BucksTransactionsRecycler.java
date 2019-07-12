@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
 
 import com.chaitupenjudcoder.buckstrack.R;
 import com.chaitupenjudcoder.buckstrack.databinding.ItemSpendingListBinding;
@@ -33,6 +34,7 @@ public class BucksTransactionsRecycler extends RecyclerView.Adapter<BucksTransac
 
     @Override
     public void onBindViewHolder(@NonNull BucksTransactionsAdapter bucksTransactionsAdapter, int i) {
+        bucksTransactionsAdapter.itenViewBinding.cvTransactions.setAnimation(AnimationUtils.loadAnimation(cxt, R.anim.transaction_card_scale_animation));
         IncomeExpense ie = allTransactions.get(i);
         bucksTransactionsAdapter.itenViewBinding.tvAmount.setText(ie.getAmount());
         bucksTransactionsAdapter.itenViewBinding.tvTitle.setText(ie.getTitle());
