@@ -1,6 +1,9 @@
 package com.chaitupenjudcoder.datapojos;
 
-public class IncomeExpense {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class IncomeExpense implements Parcelable {
     private String title;
     private String amount;
     private String date;
@@ -43,4 +46,41 @@ public class IncomeExpense {
     public String getBucksString() {
         return bucksString;
     }
+
+    protected IncomeExpense(Parcel in) {
+        title = in.readString();
+        amount = in.readString();
+        date = in.readString();
+        note = in.readString();
+        category = in.readString();
+        bucksString = in.readString();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(title);
+        dest.writeString(amount);
+        dest.writeString(date);
+        dest.writeString(note);
+        dest.writeString(category);
+        dest.writeString(bucksString);
+    }
+
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<IncomeExpense> CREATOR = new Parcelable.Creator<IncomeExpense>() {
+        @Override
+        public IncomeExpense createFromParcel(Parcel in) {
+            return new IncomeExpense(in);
+        }
+
+        @Override
+        public IncomeExpense[] newArray(int size) {
+            return new IncomeExpense[size];
+        }
+    };
 }

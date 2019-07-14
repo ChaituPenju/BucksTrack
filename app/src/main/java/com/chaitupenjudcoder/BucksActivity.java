@@ -22,6 +22,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.chaitupenjudcoder.buckstrack.R;
 import com.chaitupenjudcoder.buckstrack.databinding.ActivityBucksBinding;
@@ -46,6 +47,7 @@ public class BucksActivity extends AppCompatActivity
     com.github.clans.fab.FloatingActionButton incomeFab, expenseFab;
     FloatingActionMenu fab;
     ActivityBucksBinding bucks;
+    NavigationView navigationView;
 
     FirebaseAuth mAuth;
     FirebaseUser user;
@@ -53,6 +55,8 @@ public class BucksActivity extends AppCompatActivity
     private static final boolean BUCKS_INCOME = true;
     public static final String BUCKS_STRING_IS_INCOME_EXTRA = "income_extra";
     private static final boolean BUCKS_EXPENSE = false;
+
+    public static final String INCOME_EXPENSE_OBJECT_EXTRA = "income_expense_extra";
 
     TextView username, usermail;
 
@@ -114,7 +118,7 @@ public class BucksActivity extends AppCompatActivity
         fab = findViewById(R.id.fab);
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView = findViewById(R.id.nav_view);
         //set first option as always checked
         navigationView.getMenu().getItem(0).setChecked(true);
 
@@ -160,6 +164,13 @@ public class BucksActivity extends AppCompatActivity
                 }, "expense");
             }
         }, "income");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //  set first option as always checked when app resumes or comes back from another activity
+        navigationView.getMenu().getItem(0).setChecked(true);
     }
 
     @Override
