@@ -97,6 +97,12 @@
     <string name="pref_screen_currency_key_name">currency_key</string>
     <string name="pref_screen_date_format_name">date_format_key</string>
 
+    <!-- Adding Category Custom Dialog strings -->
+    <string name="button_category_dialog_cancel">Cancel</string>
+    <string name="button_category_dialog_ok">OK</string>
+    <string name="textview_category_dialog_enter">Enter %1$s Category</string>
+    <string name="edittext_add_category_dialog_hint">Enter category name</string>
+
     <!--widget strings-->
     <string name="appwidget_text">BUCKS TRACK</string>
     <string name="appwidget_description">Use this widget , Powered by Chaitanya Penjuri @ Bucks Track Inc.</string>

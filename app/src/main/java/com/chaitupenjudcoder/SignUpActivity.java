@@ -28,7 +28,6 @@ public class SignUpActivity extends AppCompatActivity {
 
     ActivitySignUpBinding signupUtil;
     private FirebaseAuth mAuth;
-    private FirebaseDatabase mDatabase;
     private DatabaseReference mReference1, mReference2;
 
     @Override
@@ -36,7 +35,7 @@ public class SignUpActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         signupUtil = DataBindingUtil.setContentView(this, R.layout.activity_sign_up);
         mAuth = FirebaseAuth.getInstance();
-        mDatabase = FirebaseDatabase.getInstance();
+        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
         //reference to users json
         mReference1 = mDatabase.getReference("users");
         //reference to data json
@@ -59,8 +58,8 @@ public class SignUpActivity extends AppCompatActivity {
             key = mReference2.push().getKey();
             categories.put(key, category);
         }
-        categories.clear();
         mReference2.child(userID).child("categories").child("income").setValue(categories);
+        categories.clear();
         for (String category: categoriesExpense) {
             key = mReference2.push().getKey();
             categories.put(key, category);
@@ -108,6 +107,7 @@ public class SignUpActivity extends AppCompatActivity {
                     mReference1.child(userID).setValue(userObj);
                     initFirebaseData(userID);
                     Toast.makeText(SignUpActivity.this, "SignUp Successful", Toast.LENGTH_SHORT).show();
+                    finish();
                 } else {
                     if (task.getException() instanceof FirebaseAuthUserCollisionException) {
                         Toast.makeText(SignUpActivity.this, "Email Id is Already Registered", Toast.LENGTH_SHORT).show();

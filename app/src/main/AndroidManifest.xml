@@ -8,8 +8,9 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_app_icon_round"
         android:supportsRtl="true"
+        android:name="com.chaitupenjudcoder.BucksTrackOffline"
         android:theme="@style/AppTheme">
-        <activity android:name=".CategoriesActivity"
+        <activity android:name="com.chaitupenjudcoder.CategoriesActivity"
             android:parentActivityName="com.chaitupenjudcoder.BucksActivity"/>
         <activity
             android:name="com.chaitupenjudcoder.SettingsActivity"

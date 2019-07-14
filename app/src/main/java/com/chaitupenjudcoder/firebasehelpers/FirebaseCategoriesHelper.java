@@ -37,6 +37,8 @@ public class FirebaseCategoriesHelper {
         mUser = mAuth.getCurrentUser();
         uid = mUser.getUid();
         mCategoryRef = FirebaseDatabase.getInstance().getReference("data/" + uid + "/categories");
+        //  set the keep synced true for offline capability
+        mCategoryRef.keepSynced(true);
     }
 
     public void getCategoryTotal(final GetCategoryTotal getTotals, final String category) {
