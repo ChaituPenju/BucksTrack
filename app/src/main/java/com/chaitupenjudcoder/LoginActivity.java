@@ -48,8 +48,7 @@ public class LoginActivity extends AppCompatActivity {
     }
     //login
     private void userLogin() {
-        loginUtil.etEmail.setText("chaitanyapenjurilanded95@gmail.com");
-        loginUtil.etPassword.setText("firebase");
+
         String email = loginUtil.etEmail.getText().toString();
         String password = loginUtil.etPassword.getText().toString();
 

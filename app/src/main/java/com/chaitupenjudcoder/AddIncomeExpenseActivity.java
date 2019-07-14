@@ -4,6 +4,7 @@ import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -15,6 +16,8 @@ import com.chaitupenjudcoder.buckstrack.R;
 import com.chaitupenjudcoder.buckstrack.databinding.ActivityAddIncomeExpenseBinding;
 import com.chaitupenjudcoder.datapojos.IncomeExpense;
 import com.chaitupenjudcoder.firebasehelpers.FirebaseCategoriesHelper;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -108,9 +111,14 @@ public class AddIncomeExpenseActivity extends AppCompatActivity {
         //goto spendings reference
         mReference = mDatabase.getReference("data/"+uId+"/spendings");
         //push the object into it
-        mReference.push().setValue(income);
-        String all = titleStr + " \n" + amountStr + " \n" + dateStr + " \n" + descriptionStr + " \n" + categoryStr;
-        Toast.makeText(this, "String is :\n"+all, Toast.LENGTH_SHORT).show();
+        mReference.push().setValue(income).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                Toast.makeText(AddIncomeExpenseActivity.this, "Your Data is Saved!", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+        });
+
     }
 
 }
