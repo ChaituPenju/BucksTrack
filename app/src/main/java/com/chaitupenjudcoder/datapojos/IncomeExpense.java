@@ -10,6 +10,7 @@ public class IncomeExpense implements Parcelable {
     private String note;
     private String category;
     private String bucksString;
+    private String id;
 
     public IncomeExpense() {
     }
@@ -21,6 +22,10 @@ public class IncomeExpense implements Parcelable {
         this.note = note;
         this.category = category;
         this.bucksString = bucksString;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getTitle() {
@@ -47,6 +52,10 @@ public class IncomeExpense implements Parcelable {
         return bucksString;
     }
 
+    public String getId() {
+        return id;
+    }
+
     protected IncomeExpense(Parcel in) {
         title = in.readString();
         amount = in.readString();
@@ -54,6 +63,7 @@ public class IncomeExpense implements Parcelable {
         note = in.readString();
         category = in.readString();
         bucksString = in.readString();
+        id = in.readString();
     }
 
     @Override
@@ -69,6 +79,7 @@ public class IncomeExpense implements Parcelable {
         dest.writeString(note);
         dest.writeString(category);
         dest.writeString(bucksString);
+        dest.writeSerializable(id);
     }
 
     @SuppressWarnings("unused")

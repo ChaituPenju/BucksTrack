@@ -3,6 +3,7 @@ package com.chaitupenjudcoder;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.databinding.DataBindingUtil;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -40,6 +41,8 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class BucksActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -251,17 +254,9 @@ public class BucksActivity extends AppCompatActivity
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, final int position, long id) {
 
-                categoriesHelper.getCategoryTotal(new FirebaseCategoriesHelper.GetCategoryTotal() {
-                    @Override
-                    public void categoriesTotal(final int total) {
+                categoriesHelper.getCategoryTotal(total -> {
 //                        Log.d("abcde", "inside categories total"+total);
-                        categoriesHelper.getAllCategories(new FirebaseCategoriesHelper.GetAllCategory() {
-                            @Override
-                            public void categories(ArrayList<String> categoriesList) {
-                                getIncomeExpenseCategoriesTotal(categoriesList, total);
-                            }
-                        }, categorie[position].toLowerCase());
-                    }
+                    categoriesHelper.getAllCategories(categoriesList -> getIncomeExpenseCategoriesTotal(categoriesList, total), categorie[position].toLowerCase());
                 }, categorie[position].toLowerCase());
             }
 
@@ -291,6 +286,11 @@ public class BucksActivity extends AppCompatActivity
                     }
                     catAmount.add(new CategoriesAmount(category, String.valueOf(amounts[cnt]), ((float) amounts[cnt] / total) * 100));
                     cnt++;
+                }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    catAmount.sort((CategoriesAmount first, CategoriesAmount second)-> (int) (second.getPercentage()-first.getPercentage()));
+                } else {
+                    Collections.sort(catAmount, (o1, o2) -> (int) (o2.getPercentage() - o1.getPercentage()));
                 }
                 BucksOverviewRecycler overviewRecycler = new BucksOverviewRecycler(getApplicationContext(), catAmount);
                 RecyclerView.LayoutManager manager = new LinearLayoutManager(getApplicationContext());
