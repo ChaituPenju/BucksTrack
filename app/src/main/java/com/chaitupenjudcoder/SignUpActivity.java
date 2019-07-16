@@ -58,13 +58,13 @@ public class SignUpActivity extends AppCompatActivity {
             key = mReference2.push().getKey();
             categories.put(key, category);
         }
-        mReference2.child(userID).child("categories").child("income").setValue(categories);
+        mReference2.child(userID).child("categories").child("rvIncome").setValue(categories);
         categories.clear();
         for (String category: categoriesExpense) {
             key = mReference2.push().getKey();
             categories.put(key, category);
         }
-        mReference2.child(userID).child("categories").child("expense").setValue(categories);
+        mReference2.child(userID).child("categories").child("rvExpense").setValue(categories);
     }
     //form validation function
     public void userSignup() {

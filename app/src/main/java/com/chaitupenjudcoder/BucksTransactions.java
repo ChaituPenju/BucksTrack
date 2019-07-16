@@ -1,12 +1,15 @@
 package com.chaitupenjudcoder;
 
+import android.content.DialogInterface;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.widget.Toast;
 
 import com.chaitupenjudcoder.buckstrack.R;
 import com.chaitupenjudcoder.buckstrack.databinding.ActivityBucksTransactionsBinding;
@@ -15,12 +18,15 @@ import com.chaitupenjudcoder.firebasehelpers.FirebaseTransactionsHelper;
 import com.chaitupenjudcoder.recyclerviews.BucksTransactionsRecycler;
 
 import java.util.ArrayList;
+import java.util.function.Consumer;
 
 public class BucksTransactions extends AppCompatActivity {
 
     ActivityBucksTransactionsBinding transactionUtil;
     RecyclerView rvTransactions;
     BucksTransactionsRecycler transactionRecycler;
+
+    FirebaseTransactionsHelper helper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,11 +44,11 @@ public class BucksTransactions extends AppCompatActivity {
         LinearLayoutManager manager = new LinearLayoutManager(getApplicationContext());
         rvTransactions.setLayoutManager(manager);
         rvTransactions.setHasFixedSize(true);
-        new ItemTouchHelper(swipeToDelete(transactions, transactionRecycler)).attachToRecyclerView(rvTransactions);
+        new ItemTouchHelper(swipeToDelete(transactions)).attachToRecyclerView(rvTransactions);
         transactionUtil.setTransactionAdapter(transactionRecycler);
     }
 
-    private ItemTouchHelper.SimpleCallback swipeToDelete(final ArrayList<IncomeExpense> list, final BucksTransactionsRecycler recycler) {
+    private ItemTouchHelper.SimpleCallback swipeToDelete(final ArrayList<IncomeExpense> list) {
         ItemTouchHelper.SimpleCallback callback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT | ItemTouchHelper.LEFT) {
 
             @Override
@@ -52,10 +58,25 @@ public class BucksTransactions extends AppCompatActivity {
 
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
-                list.remove(viewHolder.getAdapterPosition());
-                recycler.notifyDataSetChanged();
+                confirmDeleteDialog(list, viewHolder.getAdapterPosition());
             }
         };
         return callback;
+    }
+
+    private void confirmDeleteDialog(ArrayList<IncomeExpense> list, int position) {
+        AlertDialog.Builder confirmDelete = new AlertDialog.Builder(this)
+                .setMessage("Are you sure you want to delete transaction "+list.get(position).getTitle())
+                .setPositiveButton("OK", (dialog, which) -> {
+                    /*list.remove(position);
+                    transactionRecycler.notifyDataSetChanged();*/
+                    helper = new FirebaseTransactionsHelper();
+                    helper.deleteATransaction(response -> Toast.makeText(BucksTransactions.this, response, Toast.LENGTH_SHORT).show(), list.get(position).getId());
+                }).setNegativeButton("Don\'t delete", (dialog, which) -> {
+                    transactionRecycler.notifyDataSetChanged();
+                    dialog.dismiss();
+                });
+        AlertDialog confirmDeleteDialog = confirmDelete.create();
+        confirmDeleteDialog.show();
     }
 }

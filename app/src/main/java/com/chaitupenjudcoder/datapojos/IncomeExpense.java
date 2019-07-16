@@ -79,7 +79,7 @@ public class IncomeExpense implements Parcelable {
         dest.writeString(note);
         dest.writeString(category);
         dest.writeString(bucksString);
-        dest.writeSerializable(id);
+        dest.writeString(id);
     }
 
     @SuppressWarnings("unused")

@@ -38,7 +38,22 @@ public class FirebaseTransactionsHelper {
         void updateTransaction(String response);
     }
 
+    public interface DeleteTransaction {
+        void deleteTransaction(String response);
+    }
+
+    public void deleteATransaction(final DeleteTransaction transaction, String key) {
+        mTransactionsRef.child(key).setValue(null).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                transaction.deleteTransaction("Data is Deleted!");
+            } else {
+                transaction.deleteTransaction("Something Went Wrong!!!");
+            }
+        });
+    }
+
     public void updateATransaction(final UpdateTransaction transaction, String key, IncomeExpense ie) {
+        ie.setId(key);
         mTransactionsRef.child(key).setValue(ie).addOnCompleteListener((task) -> {
             if (task.isSuccessful()) {
                 transaction.updateTransaction("Data Updated Successfully");

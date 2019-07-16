@@ -12,6 +12,7 @@ import android.view.View;
 import com.chaitupenjudcoder.buckstrack.R;
 import com.chaitupenjudcoder.buckstrack.databinding.ActivityCategoriesBinding;
 import com.chaitupenjudcoder.buckstrack.databinding.AddCategoryCustomDialogBinding;
+import com.chaitupenjudcoder.firebasehelpers.FirebaseCategoriesHelper;
 import com.chaitupenjudcoder.recyclerviews.BucksCategoriesRecycler;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -31,7 +32,7 @@ public class CategoriesActivity extends AppCompatActivity {
     FirebaseUser mUser;
     DatabaseReference incomeExpenseRef, addCategoryRef;
 
-    RecyclerView income, expense;
+    RecyclerView rvIncome, rvExpense;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,38 +47,28 @@ public class CategoriesActivity extends AppCompatActivity {
 
         incomeExpenseRef = FirebaseDatabase.getInstance().getReference("data/" + userId + "/categories");
 
-        //retrieve the list of income and expense categories
+        //retrieve the list of rvIncome and rvExpense categories
         getIncomeExpenseCategories();
 
-        income = catBind.rvIncome;
-        expense = catBind.rvExpense;
+        rvIncome = catBind.rvIncome;
+        rvExpense = catBind.rvExpense;
 
         //create and set layout manager for each RecyclerView
         RecyclerView.LayoutManager firstLayoutManager = new LinearLayoutManager(this);
         RecyclerView.LayoutManager secondLayoutManager = new LinearLayoutManager(this);
 
-        income.setLayoutManager(firstLayoutManager);
-        expense.setLayoutManager(secondLayoutManager);
+        rvIncome.setLayoutManager(firstLayoutManager);
+        rvExpense.setLayoutManager(secondLayoutManager);
 
         initIncomeExpenseButtons();
 
     }
 
-    //  initialize/set on click functionality for income and expense adding buttons
+    //  initialize/set on click functionality for rvIncome and rvExpense adding buttons
     public void initIncomeExpenseButtons() {
-        catBind.btnAddIncomeCategory.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                initCategoryAddCustomDialog("income");
-            }
-        });
+        catBind.btnAddIncomeCategory.setOnClickListener(v -> initCategoryAddCustomDialog("rvIncome"));
 
-        catBind.btnAddExpenseCategory.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                initCategoryAddCustomDialog("expense");
-            }
-        });
+        catBind.btnAddExpenseCategory.setOnClickListener(v -> initCategoryAddCustomDialog("rvExpense"));
     }
 
     public void initCategoryAddCustomDialog(final String type) {
@@ -92,57 +83,35 @@ public class CategoriesActivity extends AppCompatActivity {
         final AlertDialog addCatDialog = catAddBuilder.create();
         addCatDialog.setCanceledOnTouchOutside(true);
 
-        addCategoryBind.btnCategoryCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                addCatDialog.dismiss();
-            }
-        });
+        addCategoryBind.btnCategoryCancel.setOnClickListener(v -> addCatDialog.dismiss());
 
-        addCategoryBind.btnCategoryOk.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String category = addCategoryBind.etAddCategory.getText().toString();
-                addIncomeExpenseCategory(type, category);
-                addCatDialog.dismiss();
-            }
+        addCategoryBind.btnCategoryOk.setOnClickListener(v -> {
+            String category = addCategoryBind.etAddCategory.getText().toString();
+            addIncomeExpenseCategory(type, category);
+            addCatDialog.dismiss();
         });
 
         addCatDialog.show();
     }
 
-    //  adding category to corresponding child(income/expense) on button click
+    //  adding category to corresponding child(rvIncome/rvExpense) on button click
     public void addIncomeExpenseCategory(String type, String category) {
         addCategoryRef = FirebaseDatabase.getInstance().getReference("data/" + mUser.getUid() + "/categories/" + type);
         addCategoryRef.push().setValue(category);
     }
 
     private void getIncomeExpenseCategories() {
-        incomeExpenseRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                ArrayList<String> incomes = new ArrayList<>();
-                ArrayList<String> expenses = new ArrayList<>();
+        FirebaseCategoriesHelper incExpCats1 = new FirebaseCategoriesHelper();
+        FirebaseCategoriesHelper incExpCats2 = new FirebaseCategoriesHelper();
 
-                for (DataSnapshot incomeShot : dataSnapshot.child("income").getChildren()) {
-                    incomes.add(incomeShot.getValue(String.class));
-                }
+        incExpCats1.getAllCategories((allCategory) -> {
+            BucksCategoriesRecycler firstAdapter = new BucksCategoriesRecycler(allCategory);
+            rvIncome.setAdapter(firstAdapter);
+        }, "income");
 
-                for (DataSnapshot expenseShot : dataSnapshot.child("expense").getChildren()) {
-                    expenses.add((expenseShot.getValue(String.class)));
-                }
-                //Initializing and set adapter for each RecyclerView
-                BucksCategoriesRecycler firstAdapter = new BucksCategoriesRecycler(incomes);
-                BucksCategoriesRecycler secondAdapter = new BucksCategoriesRecycler(expenses);
-
-                income.setAdapter(firstAdapter);
-                expense.setAdapter(secondAdapter);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
+        incExpCats2.getAllCategories((allCategory) -> {
+            BucksCategoriesRecycler firstAdapter = new BucksCategoriesRecycler(allCategory);
+            rvExpense.setAdapter(firstAdapter);
+        }, "expense");
     }
 }

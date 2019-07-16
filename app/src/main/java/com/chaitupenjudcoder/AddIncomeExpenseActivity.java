@@ -44,11 +44,11 @@ public class AddIncomeExpenseActivity extends AppCompatActivity {
 
         Intent in = getIntent();
         //  set default value for bucks string
-        BUCKS_STRING = "income";
+        BUCKS_STRING = "rvIncome";
         if (in.getExtras() != null) {
             if (in.getExtras().containsKey(BUCKS_STRING_IS_INCOME_EXTRA)) {
                 isIncome = in.getExtras().getBoolean(BUCKS_STRING_IS_INCOME_EXTRA);
-                BUCKS_STRING = isIncome ? "income" : "expense";
+                BUCKS_STRING = isIncome ? "rvIncome" : "rvExpense";
             }
 
             if (in.getExtras().containsKey(INCOME_EXPENSE_OBJECT_EXTRA)) {
@@ -95,10 +95,13 @@ public class AddIncomeExpenseActivity extends AppCompatActivity {
         dialog.show();
     }
 
-    public void updateIncomeExpenseData() {
-        IncomeExpense ie = addIncomeExpense.getIncExpTransac();
+    public void updateIncomeExpenseData(IncomeExpense incExp) {
+        String key = addIncomeExpense.getIncExpTransac().getId();
         FirebaseTransactionsHelper tHelper = new FirebaseTransactionsHelper();
-        tHelper.updateATransaction(response -> Toast.makeText(this, response, Toast.LENGTH_SHORT).show(), ie.getId(), ie);
+        tHelper.updateATransaction(response -> {
+            Toast.makeText(this, response, Toast.LENGTH_SHORT).show();
+            finish();
+        }, key, incExp);
     }
 
     public void saveIncomeExpenseData(View view) {
@@ -113,7 +116,7 @@ public class AddIncomeExpenseActivity extends AppCompatActivity {
 
         //  update transaction if it shows from update
         if (getIntent().getExtras() != null && getIntent().getExtras().containsKey(INCOME_EXPENSE_OBJECT_EXTRA)) {
-            updateIncomeExpenseData();
+            updateIncomeExpenseData(incExp);
         } else {
             FirebaseTransactionsHelper tHelper = new FirebaseTransactionsHelper();
             tHelper.addATransaction(response -> {

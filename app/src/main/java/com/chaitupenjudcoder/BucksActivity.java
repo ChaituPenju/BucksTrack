@@ -92,7 +92,7 @@ public class BucksActivity extends AppCompatActivity
 
         Toolbar toolbar = findViewById(R.id.toolbar);
 
-        //floating action buttons for income and expense adding activities
+        //floating action buttons for rvIncome and rvExpense adding activities
         incomeFab = findViewById(R.id.fab_add_income);
         expenseFab = findViewById(R.id.fab_add_expnese);
 
@@ -146,7 +146,7 @@ public class BucksActivity extends AppCompatActivity
         setTotalIncomeAndExpense();
     }
 
-    //gets the total income and expense from firebase
+    //gets the total rvIncome and rvExpense from firebase
     private void setTotalIncomeAndExpense() {
         //  initialize categories helper class
         final FirebaseCategoriesHelper helper = new FirebaseCategoriesHelper();
@@ -164,9 +164,9 @@ public class BucksActivity extends AppCompatActivity
                         expense.setText(res.getString(R.string.indian_currency_symbol, total2));
                         balance.setText(res.getString(R.string.indian_currency_symbol, total1 - total2));
                     }
-                }, "expense");
+                }, "rvExpense");
             }
-        }, "income");
+        }, "rvIncome");
     }
 
     @Override
