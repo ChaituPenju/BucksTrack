@@ -44,11 +44,11 @@ public class AddIncomeExpenseActivity extends AppCompatActivity {
 
         Intent in = getIntent();
         //  set default value for bucks string
-        BUCKS_STRING = "rvIncome";
+        BUCKS_STRING = "income";
         if (in.getExtras() != null) {
             if (in.getExtras().containsKey(BUCKS_STRING_IS_INCOME_EXTRA)) {
                 isIncome = in.getExtras().getBoolean(BUCKS_STRING_IS_INCOME_EXTRA);
-                BUCKS_STRING = isIncome ? "rvIncome" : "rvExpense";
+                BUCKS_STRING = isIncome ? "income" : "expense";
             }
 
             if (in.getExtras().containsKey(INCOME_EXPENSE_OBJECT_EXTRA)) {

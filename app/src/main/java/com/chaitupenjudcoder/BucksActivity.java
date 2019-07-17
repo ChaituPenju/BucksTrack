@@ -152,21 +152,13 @@ public class BucksActivity extends AppCompatActivity
         final FirebaseCategoriesHelper helper = new FirebaseCategoriesHelper();
 
         //  Get two totals one inside the other and set them to textviews
-        helper.getCategoryTotal(new FirebaseCategoriesHelper.GetCategoryTotal() {
-            @Override
-            public void categoriesTotal(final int total1) {
-                helper.getCategoryTotal(new FirebaseCategoriesHelper.GetCategoryTotal() {
-                    @Override
-                    public void categoriesTotal(int total2) {
-                        //set all the totals
-                        Resources res = getResources();
-                        income.setText(res.getString(R.string.indian_currency_symbol, total1));
-                        expense.setText(res.getString(R.string.indian_currency_symbol, total2));
-                        balance.setText(res.getString(R.string.indian_currency_symbol, total1 - total2));
-                    }
-                }, "rvExpense");
-            }
-        }, "rvIncome");
+        helper.getCategoryTotal(total1 -> helper.getCategoryTotal(total2 -> {
+            //set all the totals
+            Resources res = getResources();
+            income.setText(res.getString(R.string.indian_currency_symbol, total1));
+            expense.setText(res.getString(R.string.indian_currency_symbol, total2));
+            balance.setText(res.getString(R.string.indian_currency_symbol, total1 - total2));
+        }, "expense"), "income");
     }
 
     @Override

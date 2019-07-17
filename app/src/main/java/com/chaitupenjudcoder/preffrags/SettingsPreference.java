@@ -1,6 +1,7 @@
 package com.chaitupenjudcoder.preffrags;
 
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
@@ -27,25 +28,32 @@ public class SettingsPreference extends PreferenceFragment {
 
     public static final String CURRENCY_KEY = "currency_key";
     public static final String DATE_FORMAT_KEY = "date_format_key";
+    public static final String WIDGET_OPTION_KEY = "widget_option_key";
+
+    Preference currencyPref, dateFormatPref, widgetOptionPref;
+
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.bucks_preferences);
 
-        bucksPreferenceListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+        //  initialize all the preference objects
+        currencyPref = findPreference(CURRENCY_KEY);
+        dateFormatPref = findPreference(DATE_FORMAT_KEY);
+        widgetOptionPref = findPreference(WIDGET_OPTION_KEY);
 
-            @Override
-            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-                Toast.makeText(getActivity(), "inside change pref", Toast.LENGTH_SHORT).show();
-                if (key.equals(CURRENCY_KEY)) {
-                    Preference currencyPref = findPreference(key);
-                    currencyPref.setSummary(sharedPreferences.getString(key, "₹") + " currency selected");
-                }
-                if (key.equals(DATE_FORMAT_KEY)) {
-                    Preference dateFormatPref = findPreference(key);
-                    dateFormatPref.setSummary(sharedPreferences.getString(key, "dd-mm-yyyy") + " format selected");
-                }
+
+        bucksPreferenceListener = (sharedPreferences, key) -> {
+            if (key.equals(CURRENCY_KEY)) {
+                currencyPref.setSummary(sharedPreferences.getString(key, "what") + " currency selected");
+            }
+            if (key.equals(DATE_FORMAT_KEY)) {
+                dateFormatPref.setSummary(sharedPreferences.getString(key, "dd-mm-yyyy") + " format selected");
+            }
+            if (key.equals(WIDGET_OPTION_KEY)) {
+                widgetOptionPref.setSummary(sharedPreferences.getString(key, "Last Expense") + " selected");
             }
         };
 
@@ -68,7 +76,15 @@ public class SettingsPreference extends PreferenceFragment {
     @Override
     public void onResume() {
         super.onResume();
+        retainPreferenceSummaries();
         getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(bucksPreferenceListener);
+    }
+
+    private void retainPreferenceSummaries() {
+        SharedPreferences sharedPreferences = getPreferenceScreen().getSharedPreferences();
+        currencyPref.setSummary(sharedPreferences.getString(CURRENCY_KEY, "₹") + " currency selected");
+        dateFormatPref.setSummary(sharedPreferences.getString(DATE_FORMAT_KEY, "dd-mm-yyyy") + " format selected");
+        widgetOptionPref.setSummary(sharedPreferences.getString(WIDGET_OPTION_KEY, "Last Expense") + " selected");
     }
 
     //function to set last login for a preference
