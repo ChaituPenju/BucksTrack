@@ -129,5 +129,8 @@
     <string name="income_categories_text">INCOME CATEGORIES</string>
     <string name="expense_categories_list">EXPENSE CATEGORIES</string>
     <string name="categories_button_add_text">ADD</string>
+    <string name="choose_starting_date_text_hint">CHOOSE STARTING DATE</string>
+    <string name="choose_ending_date_text_hint">CHOOSE ENDING DATE</string>
+    <string name="get_transactions_btn_text">Get Transactions</string>
 
 </resources>

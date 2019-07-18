@@ -12,30 +12,46 @@
         android:layout_height="match_parent"
         tools:context="com.chaitupenjudcoder.DateChooserActivity">
 
-        <Button
-            android:id="@+id/btn_dt_start"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="120dp"
-            android:layout_marginLeft="120dp"
-            android:layout_marginTop="160dp"
-            android:text="CHOOSE START DATE"
+            android:layout_margin="8dp"
+            android:orientation="vertical"
+            android:padding="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            android:id="@+id/tv_date_start"
-            style="@style/TextAppearance.AppCompat.Caption"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="Date chosen displayed here"
-            android:textColor="#000"
-            android:textSize="30sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="@+id/btn_dt_start"
-            app:layout_constraintStart_toStartOf="@+id/btn_dt_start"
-            app:layout_constraintTop_toBottomOf="@+id/btn_dt_start" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <EditText
+                android:id="@+id/et_start_date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:focusable="false"
+                android:hint="@string/choose_starting_date_text_hint"
+                android:inputType="date" />
+
+            <EditText
+                android:id="@+id/et_end_date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:focusable="false"
+                android:hint="@string/choose_ending_date_text_hint"
+                android:inputType="date" />
+
+            <Button
+                android:id="@+id/btn_get_transactions"
+                style="@style/Widget.AppCompat.Button.Colored"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/get_transactions_btn_text" />
+        </LinearLayout>
 
     </android.support.constraint.ConstraintLayout>
 </layout>

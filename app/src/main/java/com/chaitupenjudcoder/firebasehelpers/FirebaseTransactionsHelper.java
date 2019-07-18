@@ -1,5 +1,7 @@
 package com.chaitupenjudcoder.firebasehelpers;
 
+import android.support.annotation.NonNull;
+
 import com.chaitupenjudcoder.datapojos.IncomeExpense;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -10,6 +12,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 public class FirebaseTransactionsHelper {
 
@@ -40,6 +43,45 @@ public class FirebaseTransactionsHelper {
 
     public interface DeleteTransaction {
         void deleteTransaction(String response);
+    }
+
+    public interface WeekMonthTransactions {
+        void getWeekMonthTransactions(ArrayList<IncomeExpense> transactions);
+    }
+
+    private long getDaysDiff(String date1) {
+        Calendar cal1 = Calendar.getInstance();
+        Calendar cal2 = Calendar.getInstance();
+
+        String[] split = date1.split("-");
+        cal2.set(Integer.valueOf(split[2]), Integer.valueOf(split[1]) - 1, Integer.valueOf(split[0]));
+        long diff = cal1.getTimeInMillis() - cal2.getTimeInMillis();
+        return diff / (24 * 60 * 60 * 1000);
+    }
+
+    public void getWeekOrMonthTransactions(final WeekMonthTransactions wmTransactions, long worm) {
+
+        ValueEventListener listener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot spendingShot : dataSnapshot.getChildren()) {
+                    IncomeExpense ie = spendingShot.getValue(IncomeExpense.class);
+                    String date = ie.getDate();
+                    long daysDiff = getDaysDiff(date);
+                    if (daysDiff > 0 && daysDiff < worm) {
+                        transactions.add(ie);
+                    }
+                }
+                wmTransactions.getWeekMonthTransactions(transactions);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+
+        mTransactionsRef.addListenerForSingleValueEvent(listener);
     }
 
     public void deleteATransaction(final DeleteTransaction transaction, String key) {

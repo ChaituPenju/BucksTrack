@@ -23,7 +23,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.chaitupenjudcoder.buckstrack.R;
 import com.chaitupenjudcoder.buckstrack.databinding.ActivityBucksBinding;
@@ -42,7 +41,6 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 
 public class BucksActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -97,24 +95,18 @@ public class BucksActivity extends AppCompatActivity
         expenseFab = findViewById(R.id.fab_add_expnese);
 
         //fab on click listeners, opens same activity and changes title and data insertion of activity based on fab selection
-        incomeFab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                fab.close(true);
-                addIncExp = new Intent(new Intent(BucksActivity.this, AddIncomeExpenseActivity.class));
-                addIncExp.putExtra(BUCKS_STRING_IS_INCOME_EXTRA, BUCKS_INCOME);
-                startActivity(addIncExp);
-            }
+        incomeFab.setOnClickListener(v -> {
+            fab.close(true);
+            addIncExp = new Intent(new Intent(BucksActivity.this, AddIncomeExpenseActivity.class));
+            addIncExp.putExtra(BUCKS_STRING_IS_INCOME_EXTRA, BUCKS_INCOME);
+            startActivity(addIncExp);
         });
 
-        expenseFab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                fab.close(true);
-                addIncExp = new Intent(new Intent(BucksActivity.this, AddIncomeExpenseActivity.class));
-                addIncExp.putExtra(BUCKS_STRING_IS_INCOME_EXTRA, BUCKS_EXPENSE);
-                startActivity(addIncExp);
-            }
+        expenseFab.setOnClickListener(v -> {
+            fab.close(true);
+            addIncExp = new Intent(new Intent(BucksActivity.this, AddIncomeExpenseActivity.class));
+            addIncExp.putExtra(BUCKS_STRING_IS_INCOME_EXTRA, BUCKS_EXPENSE);
+            startActivity(addIncExp);
         });
 
         setSupportActionBar(toolbar);
@@ -192,14 +184,19 @@ public class BucksActivity extends AppCompatActivity
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
+        Intent in = new Intent(BucksActivity.this, BucksTransactions.class);
         //noinspection SimplifiableIfStatement
         switch (id) {
             case R.id.action_week:
+                in.putExtra("WEEK", 7L);
+                startActivity(in);
                 return true;
             case R.id.action_month:
+                in.putExtra("MONTH", 30L);
+                startActivity(in);
                 return true;
             case R.id.action_date_range:
-                startActivity(new Intent(BucksActivity.this, DateChooserActivity.class));
+                startActivity(new Intent(new Intent(BucksActivity.this, DateChooserActivity.class)));
                 return true;
         }
 
@@ -280,7 +277,7 @@ public class BucksActivity extends AppCompatActivity
                     cnt++;
                 }
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    catAmount.sort((CategoriesAmount first, CategoriesAmount second)-> (int) (second.getPercentage()-first.getPercentage()));
+                    catAmount.sort((CategoriesAmount first, CategoriesAmount second) -> (int) (second.getPercentage() - first.getPercentage()));
                 } else {
                     Collections.sort(catAmount, (o1, o2) -> (int) (o2.getPercentage() - o1.getPercentage()));
                 }

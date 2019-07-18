@@ -1,6 +1,6 @@
 package com.chaitupenjudcoder;
 
-import android.content.DialogInterface;
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -18,7 +18,7 @@ import com.chaitupenjudcoder.firebasehelpers.FirebaseTransactionsHelper;
 import com.chaitupenjudcoder.recyclerviews.BucksTransactionsRecycler;
 
 import java.util.ArrayList;
-import java.util.function.Consumer;
+import java.util.Collections;
 
 public class BucksTransactions extends AppCompatActivity {
 
@@ -36,10 +36,17 @@ public class BucksTransactions extends AppCompatActivity {
         rvTransactions = transactionUtil.rvTransactions;
         FirebaseTransactionsHelper transactionsHelper = new FirebaseTransactionsHelper();
 
-        transactionsHelper.getAllTransactions(this::initTransasctionsRecycler);
+        Intent in = getIntent();
+        if (in.getExtras() != null && (in.getExtras().containsKey("WEEK") || in.getExtras().containsKey("MONTH"))) {
+            long days = in.getExtras().containsKey("WEEK") ? in.getExtras().getLong("WEEK") : in.getExtras().getLong(("MONTH"));
+            transactionsHelper.getWeekOrMonthTransactions(this::initTransasctionsRecycler, days);
+        } else {
+            transactionsHelper.getAllTransactions(this::initTransasctionsRecycler);
+        }
     }
 
     private void initTransasctionsRecycler(ArrayList<IncomeExpense> transactions) {
+        Collections.sort(transactions, (d1, d2) -> d2.getDate().compareTo(d1.getDate()));
         transactionRecycler = new BucksTransactionsRecycler(getApplicationContext(), transactions);
         LinearLayoutManager manager = new LinearLayoutManager(getApplicationContext());
         rvTransactions.setLayoutManager(manager);
@@ -66,7 +73,7 @@ public class BucksTransactions extends AppCompatActivity {
 
     private void confirmDeleteDialog(ArrayList<IncomeExpense> list, int position) {
         AlertDialog.Builder confirmDelete = new AlertDialog.Builder(this)
-                .setMessage("Are you sure you want to delete transaction "+list.get(position).getTitle())
+                .setMessage("Are you sure you want to delete transaction " + list.get(position).getTitle())
                 .setPositiveButton("OK", (dialog, which) -> {
                     /*list.remove(position);
                     transactionRecycler.notifyDataSetChanged();*/
