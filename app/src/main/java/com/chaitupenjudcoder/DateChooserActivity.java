@@ -1,15 +1,23 @@
 package com.chaitupenjudcoder;
 
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.chaitupenjudcoder.buckstrack.R;
 import com.chaitupenjudcoder.buckstrack.databinding.ActivityDateChooserBinding;
+import com.chaitupenjudcoder.firebasehelpers.FirebaseTransactionsHelper;
 
+import java.text.ParseException;
 import java.util.Calendar;
+
+import static com.chaitupenjudcoder.firebasehelpers.FirebaseTransactionsHelper.BETWEEN_TWO_DATES_EXTRA;
+import static com.chaitupenjudcoder.firebasehelpers.FirebaseTransactionsHelper.DATE_ONE_EXTRA;
+import static com.chaitupenjudcoder.firebasehelpers.FirebaseTransactionsHelper.DATE_TWO_EXTRA;
 
 public class DateChooserActivity extends AppCompatActivity {
     ActivityDateChooserBinding dateChooser;
@@ -23,15 +31,20 @@ public class DateChooserActivity extends AppCompatActivity {
         eStartDate = dateChooser.etStartDate;
         eEndDate = dateChooser.etEndDate;
 
+        FirebaseTransactionsHelper helper = new FirebaseTransactionsHelper();
+
         eStartDate.setOnClickListener(v -> initDatePickerDialog(eStartDate));
         eEndDate.setOnClickListener(v -> initDatePickerDialog(eEndDate));
         dateChooser.btnGetTransactions.setOnClickListener(v -> {
             String startDate = dateChooser.etStartDate.getText().toString();
             String endDate = dateChooser.etEndDate.getText().toString();
-            Calendar cal1 = Calendar.getInstance();
-            Calendar cal2 = Calendar.getInstance();
 
+            Intent in = new Intent(this, BucksTransactions.class);
+            in.putExtra(DATE_ONE_EXTRA, startDate);
+            in.putExtra(DATE_TWO_EXTRA, endDate);
+            startActivity(in);
         });
+
     }
 
     public void initDatePickerDialog(EditText et1) {

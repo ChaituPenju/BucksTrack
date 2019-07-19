@@ -20,6 +20,9 @@ import com.chaitupenjudcoder.recyclerviews.BucksTransactionsRecycler;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import static com.chaitupenjudcoder.firebasehelpers.FirebaseTransactionsHelper.DATE_ONE_EXTRA;
+import static com.chaitupenjudcoder.firebasehelpers.FirebaseTransactionsHelper.DATE_TWO_EXTRA;
+
 public class BucksTransactions extends AppCompatActivity {
 
     ActivityBucksTransactionsBinding transactionUtil;
@@ -37,9 +40,15 @@ public class BucksTransactions extends AppCompatActivity {
         FirebaseTransactionsHelper transactionsHelper = new FirebaseTransactionsHelper();
 
         Intent in = getIntent();
-        if (in.getExtras() != null && (in.getExtras().containsKey("WEEK") || in.getExtras().containsKey("MONTH"))) {
-            long days = in.getExtras().containsKey("WEEK") ? in.getExtras().getLong("WEEK") : in.getExtras().getLong(("MONTH"));
-            transactionsHelper.getWeekOrMonthTransactions(this::initTransasctionsRecycler, days);
+        if (in.getExtras() != null) {
+            if ((in.getExtras().containsKey("WEEK") || in.getExtras().containsKey("MONTH"))) {
+                long days = in.getExtras().containsKey("WEEK") ? in.getExtras().getLong("WEEK") : in.getExtras().getLong(("MONTH"));
+                transactionsHelper.getWeekOrMonthTransactions(this::initTransasctionsRecycler, days);
+            } else if (in.getExtras().containsKey(DATE_ONE_EXTRA) && in.getExtras().containsKey(DATE_TWO_EXTRA)) {
+                String date1 = in.getExtras().getString(DATE_ONE_EXTRA);
+                String date2 = in.getExtras().getString(DATE_TWO_EXTRA);
+                transactionsHelper.getTransactionsBwTwoDates(this::initTransasctionsRecycler, date1, date2);
+            }
         } else {
             transactionsHelper.getAllTransactions(this::initTransasctionsRecycler);
         }

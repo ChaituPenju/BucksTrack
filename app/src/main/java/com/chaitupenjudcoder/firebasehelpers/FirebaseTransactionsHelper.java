@@ -1,6 +1,7 @@
 package com.chaitupenjudcoder.firebasehelpers;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.chaitupenjudcoder.datapojos.IncomeExpense;
 import com.google.firebase.auth.FirebaseAuth;
@@ -11,10 +12,19 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 public class FirebaseTransactionsHelper {
+    public static final String WEEK_EXTRA = "week";
+    public static final String MONTH_EXTRA = "month";
+    public static final String BETWEEN_TWO_DATES_EXTRA = "between_two_dates";
+    public static final String DATE_ONE_EXTRA = "date1";
+    public static final String DATE_TWO_EXTRA = "date2";
 
     private DatabaseReference mTransactionsRef;
     private FirebaseAuth mAuth;
@@ -47,6 +57,56 @@ public class FirebaseTransactionsHelper {
 
     public interface WeekMonthTransactions {
         void getWeekMonthTransactions(ArrayList<IncomeExpense> transactions);
+    }
+
+    public interface TransactionsBetweenTwoDates {
+        void getTransactionsBetweenTwoDates(ArrayList<IncomeExpense> transactions);
+    }
+
+    public void getTransactionsBwTwoDates(final TransactionsBetweenTwoDates bwTwoDates, String date1, String date2) {
+        SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss.SSS", Locale.ENGLISH);
+        Date startDate = null, endDate = null;
+        long start, end;
+        try{
+            startDate = format.parse(date1 + " 00:00:00.000");
+            endDate = format.parse(date2 + " 00:00:00.000");
+        }catch (ParseException pe) {
+            pe.printStackTrace();
+        }
+
+        start = startDate.getTime() / 1000;
+        end = endDate.getTime() / 1000;
+
+        ValueEventListener listener = new ValueEventListener() {
+            long d;
+            String date = null;
+
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot dateShot : dataSnapshot.getChildren()) {
+                    IncomeExpense ie = dateShot.getValue(IncomeExpense.class);
+                    date = ie.getDate();
+
+                    try {
+                        d = format.parse(date + " 00:00:00.000").getTime() / 1000;
+                    } catch (ParseException pe) {
+                        pe.printStackTrace();
+                    }
+                    if (start <= d && d <= end) {
+                        transactions.add(ie);
+                    }
+                }
+                bwTwoDates.getTransactionsBetweenTwoDates(transactions);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                //
+            }
+        };
+        mTransactionsRef.addListenerForSingleValueEvent(listener);
+
+
     }
 
     private long getDaysDiff(String date1) {
