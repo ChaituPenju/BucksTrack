@@ -47,12 +47,17 @@
     <string name="textview_income_text">INCOME</string>
     <string name="textview_expenses_text">EXPENSES</string>
 
+    <!-- Choose Date Range screen strings -->
+    <string name="choose_starting_date_text_hint">CHOOSE STARTING DATE</string>
+    <string name="choose_ending_date_text_hint">CHOOSE ENDING DATE</string>
+    <string name="get_transactions_btn_text">Get Transactions</string>
+
     <!--fab texts-->
     <string name="add_income_fab_text">Add Income</string>
     <string name="add_expense_fab_text">Add Expense</string>
 
     <!--currency symbols-->
-    <string name="indian_currency_symbol">₹ %1$d</string>
+    <string name="currency_symbol">%1$s %2$d</string>
 
     <!--date string with day and month padded zero on left for 1 digit-->
     <string name="date_format_string">%1$02d-%2$02d-%3$d</string>
@@ -129,8 +134,5 @@
     <string name="income_categories_text">INCOME CATEGORIES</string>
     <string name="expense_categories_list">EXPENSE CATEGORIES</string>
     <string name="categories_button_add_text">ADD</string>
-    <string name="choose_starting_date_text_hint">CHOOSE STARTING DATE</string>
-    <string name="choose_ending_date_text_hint">CHOOSE ENDING DATE</string>
-    <string name="get_transactions_btn_text">Get Transactions</string>
 
 </resources>
