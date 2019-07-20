@@ -4,6 +4,7 @@ import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -14,9 +15,11 @@ import android.widget.Toast;
 import com.chaitupenjudcoder.buckstrack.R;
 import com.chaitupenjudcoder.buckstrack.databinding.ActivityAddIncomeExpenseBinding;
 import com.chaitupenjudcoder.datapojos.IncomeExpense;
+import com.chaitupenjudcoder.firebasehelpers.BucksInputValidationHelper;
 import com.chaitupenjudcoder.firebasehelpers.FirebaseCategoriesHelper;
 import com.chaitupenjudcoder.firebasehelpers.FirebaseTransactionsHelper;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import static com.chaitupenjudcoder.BucksActivity.BUCKS_STRING_IS_INCOME_EXTRA;
@@ -28,6 +31,7 @@ public class AddIncomeExpenseActivity extends AppCompatActivity {
     boolean isIncome;
     String BUCKS_STRING;
     EditText title, amount, date, description;
+    TextInputLayout titleLout, amountLout, dateLout, descriptionLout;
     String titleStr, amountStr, dateStr, descriptionStr, categoryStr;
 
     IncomeExpense incExp;
@@ -37,10 +41,17 @@ public class AddIncomeExpenseActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         addIncomeExpense = DataBindingUtil.setContentView(this, R.layout.activity_add_income_expense);
 
+        //  initialize all edit texts
         title = addIncomeExpense.etTitle;
         amount = addIncomeExpense.etAmount;
         date = addIncomeExpense.etDate;
         description = addIncomeExpense.etDescription;
+
+        //  initialize all text input layouts
+        titleLout = addIncomeExpense.etTitleWrapper;
+        amountLout = addIncomeExpense.etAmountWrapper;
+        dateLout = addIncomeExpense.etDateWrapper;
+        descriptionLout = addIncomeExpense.etDescriptionWrapper;
 
         Intent in = getIntent();
         //  set default value for bucks string
@@ -62,16 +73,19 @@ public class AddIncomeExpenseActivity extends AppCompatActivity {
         date.setOnClickListener(v -> initDatePickerDialog());
 
         FirebaseCategoriesHelper categoryHelper = new FirebaseCategoriesHelper();
-        categoryHelper.getAllCategories(categoriesList -> {
-            String[] categorie = new String[categoriesList.size()];
-            categorie = categoriesList.toArray(categorie);
-            ArrayAdapter<String> cats = new ArrayAdapter<>(getApplication(), android.R.layout.simple_spinner_dropdown_item, categorie);
-            addIncomeExpense.spiCategories.setAdapter(cats);
-            if (getIntent().getExtras().containsKey(INCOME_EXPENSE_OBJECT_EXTRA)) {
-                IncomeExpense ie = getIntent().getParcelableExtra(INCOME_EXPENSE_OBJECT_EXTRA);
-                setSelectSpinnerValue(ie.getCategory());
-            }
-        }, BUCKS_STRING);
+        categoryHelper.getAllCategories(this::setSpinnerAdapter, BUCKS_STRING);
+    }
+
+    private void setSpinnerAdapter(ArrayList<String> categoriesList) {
+        String[] categorie = new String[categoriesList.size()];
+        categorie = categoriesList.toArray(categorie);
+        ArrayAdapter<String> cats = new ArrayAdapter<>(getApplication(), android.R.layout.simple_spinner_dropdown_item, categorie);
+        addIncomeExpense.spiCategories.setAdapter(cats);
+
+        if (getIntent().getExtras().containsKey(INCOME_EXPENSE_OBJECT_EXTRA)) {
+            IncomeExpense ie = getIntent().getParcelableExtra(INCOME_EXPENSE_OBJECT_EXTRA);
+            setSelectSpinnerValue(ie.getCategory());
+        }
     }
 
     private void setSelectSpinnerValue(String category) {
@@ -111,6 +125,13 @@ public class AddIncomeExpenseActivity extends AppCompatActivity {
         descriptionStr = description.getText().toString();
         categoryStr = (String) addIncomeExpense.spiCategories.getSelectedItem();
 
+        BucksInputValidationHelper validationHelper = new BucksInputValidationHelper();
+
+        //  input validation
+        if (!validationHelper.inputValidator(titleLout, titleLout.getCounterMaxLength()) | !validationHelper.inputValidator(amountLout, amountLout.getCounterMaxLength()) | !validationHelper.inputValidator(dateLout, 10) | !validationHelper.inputValidator(descriptionLout, descriptionLout.getCounterMaxLength())) {
+            return;
+        }
+
         //  create an instance of addincomeexpense object to push
         incExp = new IncomeExpense(titleStr, amountStr, dateStr, descriptionStr, categoryStr, BUCKS_STRING);
 
@@ -118,8 +139,7 @@ public class AddIncomeExpenseActivity extends AppCompatActivity {
         if (getIntent().getExtras() != null && getIntent().getExtras().containsKey(INCOME_EXPENSE_OBJECT_EXTRA)) {
             updateIncomeExpenseData(incExp);
         } else {
-            FirebaseTransactionsHelper tHelper = new FirebaseTransactionsHelper();
-            tHelper.addATransaction(response -> {
+            new FirebaseTransactionsHelper().addATransaction(response -> {
                 Toast.makeText(this, response, Toast.LENGTH_SHORT).show();
                 finish();
             }, incExp);

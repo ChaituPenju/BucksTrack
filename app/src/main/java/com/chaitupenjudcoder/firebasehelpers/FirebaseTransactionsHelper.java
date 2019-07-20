@@ -1,7 +1,6 @@
 package com.chaitupenjudcoder.firebasehelpers;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.chaitupenjudcoder.datapojos.IncomeExpense;
 import com.google.firebase.auth.FirebaseAuth;
@@ -67,10 +66,10 @@ public class FirebaseTransactionsHelper {
         SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss.SSS", Locale.ENGLISH);
         Date startDate = null, endDate = null;
         long start, end;
-        try{
+        try {
             startDate = format.parse(date1 + " 00:00:00.000");
             endDate = format.parse(date2 + " 00:00:00.000");
-        }catch (ParseException pe) {
+        } catch (ParseException pe) {
             pe.printStackTrace();
         }
 

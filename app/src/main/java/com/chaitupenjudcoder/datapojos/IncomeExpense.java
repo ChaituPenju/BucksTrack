@@ -28,6 +28,10 @@ public class IncomeExpense implements Parcelable {
         this.id = id;
     }
 
+    public void setDate(String date) {
+        this.date = date;
+    }
+
     public String getTitle() {
         return title;
     }

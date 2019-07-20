@@ -14,7 +14,11 @@ import com.chaitupenjudcoder.buckstrack.R;
 import com.chaitupenjudcoder.buckstrack.databinding.ItemSpendingListBinding;
 import com.chaitupenjudcoder.datapojos.IncomeExpense;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
 import static com.chaitupenjudcoder.BucksActivity.BUCKS_STRING_IS_INCOME_EXTRA;
 import static com.chaitupenjudcoder.BucksActivity.INCOME_EXPENSE_OBJECT_EXTRA;
@@ -29,6 +33,18 @@ public class BucksTransactionsRecycler extends RecyclerView.Adapter<BucksTransac
         this.allTransactions = allTransactions;
     }
 
+    public String convertDate(String dtFormat1, String dtFormat2, String dateStr) {
+        SimpleDateFormat format1 = new SimpleDateFormat(dtFormat1, Locale.ENGLISH);
+        SimpleDateFormat format2 = new SimpleDateFormat(dtFormat2, Locale.ENGLISH);
+        Date date = null;
+        try {
+            date = format1.parse(dateStr);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return format2.format(date);
+    }
+
     @NonNull
     @Override
     public BucksTransactionsAdapter onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
@@ -41,6 +57,7 @@ public class BucksTransactionsRecycler extends RecyclerView.Adapter<BucksTransac
     public void onBindViewHolder(@NonNull BucksTransactionsAdapter bucksTransactionsAdapter, int i) {
         bucksTransactionsAdapter.itemViewBinding.cvTransactions.setAnimation(AnimationUtils.loadAnimation(cxt, R.anim.transaction_card_scale_animation));
         IncomeExpense ie = allTransactions.get(i);
+        ie.setDate(convertDate("dd-MM-yyyy", "dd/MM/yyyy", ie.getDate()));
         bucksTransactionsAdapter.bind(ie);
         bucksTransactionsAdapter.itemViewBinding.setTransactionClickListener(bucksTransactionsAdapter);
     }
