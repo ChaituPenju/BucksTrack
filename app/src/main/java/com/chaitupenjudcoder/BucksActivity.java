@@ -23,6 +23,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.chaitupenjudcoder.buckstrack.R;
 import com.chaitupenjudcoder.buckstrack.databinding.ActivityBucksBinding;
@@ -58,6 +59,8 @@ public class BucksActivity extends AppCompatActivity
     private static final boolean BUCKS_EXPENSE = false;
 
     public static final String INCOME_EXPENSE_OBJECT_EXTRA = "income_expense_extra";
+    String currencySymbol;
+    int totalIncome, totalExpense;
 
     TextView username, usermail;
 
@@ -67,12 +70,15 @@ public class BucksActivity extends AppCompatActivity
     Spinner categories;
     RecyclerView rv_categories;
 
+    SharedPreferencesHelper h;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         bucks = DataBindingUtil.setContentView(this, R.layout.activity_bucks);
         PreferenceManager.setDefaultValues(this, R.xml.bucks_preferences, true);
+        h = new SharedPreferencesHelper(this);
 
         //get Firebase authentication instance and user
         mAuth = FirebaseAuth.getInstance();
@@ -145,12 +151,18 @@ public class BucksActivity extends AppCompatActivity
 
         //  Get two totals one inside the other and set them to textviews
         helper.getCategoryTotal(total1 -> helper.getCategoryTotal(total2 -> {
+            totalIncome = total1; totalExpense = total2;
             //set all the totals
-            Resources res = getResources();
-            income.setText(res.getString(R.string.indian_currency_symbol, total1));
-            expense.setText(res.getString(R.string.indian_currency_symbol, total2));
-            balance.setText(res.getString(R.string.indian_currency_symbol, total1 - total2));
+            setCurrencyAndTotal(total1, total2);
         }, "expense"), "income");
+    }
+
+    public void setCurrencyAndTotal(int totalIncome, int totalExpense) {
+        Resources res = getResources();
+        currencySymbol = h.getCurrencyPref("R");
+        income.setText(res.getString(R.string.currency_symbol, currencySymbol, totalIncome));
+        expense.setText(res.getString(R.string.currency_symbol, currencySymbol, totalExpense));
+        balance.setText(res.getString(R.string.currency_symbol, currencySymbol, totalIncome - totalExpense));
     }
 
     @Override
@@ -158,6 +170,7 @@ public class BucksActivity extends AppCompatActivity
         super.onResume();
         //  set first option as always checked when app resumes or comes back from another activity
         navigationView.getMenu().getItem(0).setChecked(true);
+        setCurrencyAndTotal(totalIncome, totalExpense);
     }
 
     @Override

@@ -40,7 +40,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:paddingBottom="8dp"
-                android:text="@string/indian_currency_symbol" />
+                android:text="@string/currency_symbol" />
 
             <View
                 android:layout_width="match_parent"
@@ -76,7 +76,7 @@
                     style="@style/TextAppearance.AppCompat.Title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/indian_currency_symbol" />
+                    android:text="@string/currency_symbol" />
             </LinearLayout>
 
             <View
@@ -104,7 +104,7 @@
                     style="@style/TextAppearance.AppCompat.Title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/indian_currency_symbol" />
+                    android:text="@string/currency_symbol" />
             </LinearLayout>
         </LinearLayout>
 
