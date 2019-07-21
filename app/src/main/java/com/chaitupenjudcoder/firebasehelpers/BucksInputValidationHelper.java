@@ -17,4 +17,16 @@ public class BucksInputValidationHelper {
             return true;
         }
     }
+
+    public boolean passwordValidator(TextInputLayout first, TextInputLayout second) {
+        String firstInput = first.getEditText().getText().toString().trim();
+        String secondInput = second.getEditText().getText().toString().trim();
+        if (firstInput.equals(secondInput)) {
+            second.setError(null);
+            return true;
+        } else {
+            second.setError("Password and Confirm Password must match");
+            return false;
+        }
+    }
 }
