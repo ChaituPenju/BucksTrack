@@ -23,12 +23,12 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.chaitupenjudcoder.buckstrack.R;
 import com.chaitupenjudcoder.buckstrack.databinding.ActivityBucksBinding;
 import com.chaitupenjudcoder.datapojos.CategoriesAmount;
 import com.chaitupenjudcoder.firebasehelpers.FirebaseCategoriesHelper;
+import com.chaitupenjudcoder.firebasehelpers.SharedPreferencesHelper;
 import com.chaitupenjudcoder.recyclerviews.BucksOverviewRecycler;
 import com.github.clans.fab.FloatingActionMenu;
 import com.google.firebase.auth.FirebaseAuth;

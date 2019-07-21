@@ -15,6 +15,7 @@ import com.chaitupenjudcoder.buckstrack.R;
 import com.chaitupenjudcoder.buckstrack.databinding.ActivityBucksTransactionsBinding;
 import com.chaitupenjudcoder.datapojos.IncomeExpense;
 import com.chaitupenjudcoder.firebasehelpers.FirebaseTransactionsHelper;
+import com.chaitupenjudcoder.firebasehelpers.SharedPreferencesHelper;
 import com.chaitupenjudcoder.recyclerviews.BucksTransactionsRecycler;
 
 import java.util.ArrayList;
@@ -38,6 +39,7 @@ public class BucksTransactions extends AppCompatActivity {
 
         rvTransactions = transactionUtil.rvTransactions;
         FirebaseTransactionsHelper transactionsHelper = new FirebaseTransactionsHelper();
+        String dateFormat = new SharedPreferencesHelper(getApplicationContext()).getDateFormatPref("dd-MM-yyyy");
 
         Intent in = getIntent();
         if (in.getExtras() != null) {
@@ -47,7 +49,7 @@ public class BucksTransactions extends AppCompatActivity {
             } else if (in.getExtras().containsKey(DATE_ONE_EXTRA) && in.getExtras().containsKey(DATE_TWO_EXTRA)) {
                 String date1 = in.getExtras().getString(DATE_ONE_EXTRA);
                 String date2 = in.getExtras().getString(DATE_TWO_EXTRA);
-                transactionsHelper.getTransactionsBwTwoDates(this::initTransasctionsRecycler, date1, date2);
+                transactionsHelper.getTransactionsBwTwoDates(this::initTransasctionsRecycler, date1, date2, dateFormat);
             }
         } else {
             transactionsHelper.getAllTransactions(this::initTransasctionsRecycler);

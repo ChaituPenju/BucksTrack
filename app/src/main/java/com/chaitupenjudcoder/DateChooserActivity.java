@@ -11,6 +11,7 @@ import android.widget.Toast;
 import com.chaitupenjudcoder.buckstrack.R;
 import com.chaitupenjudcoder.buckstrack.databinding.ActivityDateChooserBinding;
 import com.chaitupenjudcoder.firebasehelpers.FirebaseTransactionsHelper;
+import com.chaitupenjudcoder.firebasehelpers.SharedPreferencesHelper;
 
 import java.text.ParseException;
 import java.util.Calendar;
@@ -31,7 +32,6 @@ public class DateChooserActivity extends AppCompatActivity {
         eStartDate = dateChooser.etStartDate;
         eEndDate = dateChooser.etEndDate;
 
-        FirebaseTransactionsHelper helper = new FirebaseTransactionsHelper();
 
         eStartDate.setOnClickListener(v -> initDatePickerDialog(eStartDate));
         eEndDate.setOnClickListener(v -> initDatePickerDialog(eEndDate));
@@ -47,13 +47,18 @@ public class DateChooserActivity extends AppCompatActivity {
 
     }
 
-    public void initDatePickerDialog(EditText et1) {
+    public void initDatePickerDialog(EditText et) {
         Calendar c = Calendar.getInstance();
         final int dayOfMonth = c.get(Calendar.DAY_OF_MONTH);
         final int month = c.get(Calendar.MONTH);
         final int year = c.get(Calendar.YEAR);
 
-        DatePickerDialog datePick = new DatePickerDialog(DateChooserActivity.this, (view, year1, month1, dayOfMonth1) -> et1.setText(getResources().getString(R.string.date_format_string, dayOfMonth1, (month1 + 1), year1)), year, month, dayOfMonth);
+        DatePickerDialog datePick = new DatePickerDialog(DateChooserActivity.this, (view, year1, month1, dayOfMonth1) -> {
+            //something
+            String date = new SharedPreferencesHelper(DateChooserActivity.this).convertDate(getResources().getString(R.string.date_format_string, dayOfMonth1, (month1 + 1), year1));
+            et.setText(date);
+        }, year, month, dayOfMonth);
+
         datePick.show();
     }
 }

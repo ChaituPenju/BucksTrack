@@ -1,8 +1,13 @@
-package com.chaitupenjudcoder;
+package com.chaitupenjudcoder.firebasehelpers;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class SharedPreferencesHelper {
 
@@ -15,7 +20,7 @@ public class SharedPreferencesHelper {
 
     public SharedPreferencesHelper(Context ctx) {
         this.ctx = ctx;
-        preferences = PreferenceManager.getDefaultSharedPreferences(ctx);
+        preferences = PreferenceManager.getDefaultSharedPreferences(this.ctx);
     }
 
     public String getCurrencyPref(String defValue) {
@@ -30,5 +35,17 @@ public class SharedPreferencesHelper {
         return preferences.getString(WIDGET_OPTION_KEY, defValue);
     }
 
+    public String convertDate(String dateStr) {
+        String datePreference = getDateFormatPref("dd-MM-yyyy");
+        SimpleDateFormat format1 = new SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH);
+        SimpleDateFormat format2 = new SimpleDateFormat(datePreference, Locale.ENGLISH);
+        Date date = null;
+        try {
+            date = format1.parse(dateStr);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return format2.format(date);
+    }
 
 }

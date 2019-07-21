@@ -1,6 +1,7 @@
 package com.chaitupenjudcoder.firebasehelpers;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.chaitupenjudcoder.datapojos.IncomeExpense;
 import com.google.firebase.auth.FirebaseAuth;
@@ -62,8 +63,9 @@ public class FirebaseTransactionsHelper {
         void getTransactionsBetweenTwoDates(ArrayList<IncomeExpense> transactions);
     }
 
-    public void getTransactionsBwTwoDates(final TransactionsBetweenTwoDates bwTwoDates, String date1, String date2) {
-        SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss.SSS", Locale.ENGLISH);
+    public void getTransactionsBwTwoDates(final TransactionsBetweenTwoDates bwTwoDates, String date1, String date2, String dateFormat) {
+        SimpleDateFormat format = new SimpleDateFormat(dateFormat + " HH:mm:ss.SSS", Locale.ENGLISH);
+        SimpleDateFormat defFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss.SSS", Locale.ENGLISH);
         Date startDate = null, endDate = null;
         long start, end;
         try {
@@ -72,6 +74,7 @@ public class FirebaseTransactionsHelper {
         } catch (ParseException pe) {
             pe.printStackTrace();
         }
+        Log.d("XXXXX", startDate + "   " + endDate);
 
         start = startDate.getTime() / 1000;
         end = endDate.getTime() / 1000;
@@ -87,7 +90,7 @@ public class FirebaseTransactionsHelper {
                     date = ie.getDate();
 
                     try {
-                        d = format.parse(date + " 00:00:00.000").getTime() / 1000;
+                        d = defFormat.parse(date + " 00:00:00.000").getTime() / 1000;
                     } catch (ParseException pe) {
                         pe.printStackTrace();
                     }
