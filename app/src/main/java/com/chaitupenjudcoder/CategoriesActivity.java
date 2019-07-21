@@ -66,9 +66,9 @@ public class CategoriesActivity extends AppCompatActivity {
 
     //  initialize/set on click functionality for rvIncome and rvExpense adding buttons
     public void initIncomeExpenseButtons() {
-        catBind.btnAddIncomeCategory.setOnClickListener(v -> initCategoryAddCustomDialog("rvIncome"));
+        catBind.btnAddIncomeCategory.setOnClickListener(v -> initCategoryAddCustomDialog("Income"));
 
-        catBind.btnAddExpenseCategory.setOnClickListener(v -> initCategoryAddCustomDialog("rvExpense"));
+        catBind.btnAddExpenseCategory.setOnClickListener(v -> initCategoryAddCustomDialog("Expense"));
     }
 
     public void initCategoryAddCustomDialog(final String type) {

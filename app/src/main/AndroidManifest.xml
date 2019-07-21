@@ -26,6 +26,8 @@
                 android:resource="@xml/bucks_track_widget_info" />
         </receiver>
 
+        <service android:name="com.chaitupenjudcoder.intentservices.BucksIntentService" />
+
         <!-- Accessibility Setting for focussing on Edittext in Activity -->
         <activity
             android:name="com.chaitupenjudcoder.AddIncomeExpenseActivity"

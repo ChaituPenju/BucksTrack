@@ -27,6 +27,7 @@ import android.widget.TextView;
 import com.chaitupenjudcoder.buckstrack.R;
 import com.chaitupenjudcoder.buckstrack.databinding.ActivityBucksBinding;
 import com.chaitupenjudcoder.datapojos.CategoriesAmount;
+import com.chaitupenjudcoder.firebasehelpers.BucksWidgetHelper;
 import com.chaitupenjudcoder.firebasehelpers.FirebaseCategoriesHelper;
 import com.chaitupenjudcoder.firebasehelpers.SharedPreferencesHelper;
 import com.chaitupenjudcoder.recyclerviews.BucksOverviewRecycler;
@@ -79,6 +80,8 @@ public class BucksActivity extends AppCompatActivity
         bucks = DataBindingUtil.setContentView(this, R.layout.activity_bucks);
         PreferenceManager.setDefaultValues(this, R.xml.bucks_preferences, true);
         h = new SharedPreferencesHelper(this);
+
+        new BucksWidgetHelper().callIntentService(this, h.getWidgetOptionPref("Last Income"));
 
         //get Firebase authentication instance and user
         mAuth = FirebaseAuth.getInstance();
@@ -151,7 +154,8 @@ public class BucksActivity extends AppCompatActivity
 
         //  Get two totals one inside the other and set them to textviews
         helper.getCategoryTotal(total1 -> helper.getCategoryTotal(total2 -> {
-            totalIncome = total1; totalExpense = total2;
+            totalIncome = total1;
+            totalExpense = total2;
             //set all the totals
             setCurrencyAndTotal(total1, total2);
         }, "expense"), "income");

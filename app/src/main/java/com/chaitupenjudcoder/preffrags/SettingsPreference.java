@@ -1,7 +1,6 @@
 package com.chaitupenjudcoder.preffrags;
 
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
@@ -10,6 +9,7 @@ import android.support.annotation.Nullable;
 import android.widget.Toast;
 
 import com.chaitupenjudcoder.buckstrack.R;
+import com.chaitupenjudcoder.firebasehelpers.BucksWidgetHelper;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -31,13 +31,14 @@ public class SettingsPreference extends PreferenceFragment {
     public static final String WIDGET_OPTION_KEY = "widget_option_key";
 
     Preference currencyPref, dateFormatPref, widgetOptionPref;
-
+    BucksWidgetHelper helper;
 
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.bucks_preferences);
+        helper = new BucksWidgetHelper();
 
         //  initialize all the preference objects
         currencyPref = findPreference(CURRENCY_KEY);
@@ -53,6 +54,7 @@ public class SettingsPreference extends PreferenceFragment {
                 dateFormatPref.setSummary(sharedPreferences.getString(key, "dd-mm-yyyy") + " format selected");
             }
             if (key.equals(WIDGET_OPTION_KEY)) {
+                helper.callIntentService(getActivity(), sharedPreferences.getString(key, "Last Income"));
                 widgetOptionPref.setSummary(sharedPreferences.getString(key, "Last Expense") + " selected");
             }
         };

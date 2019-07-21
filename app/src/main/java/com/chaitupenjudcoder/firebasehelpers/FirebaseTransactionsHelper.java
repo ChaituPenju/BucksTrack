@@ -37,10 +37,15 @@ public class FirebaseTransactionsHelper {
         mUser = mAuth.getCurrentUser();
         uid = mUser.getUid();
         mTransactionsRef = FirebaseDatabase.getInstance().getReference("data/" + uid + "/spendings");
+        mTransactionsRef.keepSynced(true);
     }
 
     public interface GetAllTransactions {
         void allTransactions(ArrayList<IncomeExpense> transactions);
+    }
+
+    public interface GetLastTransaction {
+        void getlastTransaction(IncomeExpense ie);
     }
 
     public interface AddTransaction {
@@ -61,6 +66,27 @@ public class FirebaseTransactionsHelper {
 
     public interface TransactionsBetweenTwoDates {
         void getTransactionsBetweenTwoDates(ArrayList<IncomeExpense> transactions);
+    }
+
+    public void getALastTransaction(final GetLastTransaction transaction, String incExp) {
+        ValueEventListener listener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot shot : dataSnapshot.getChildren()) {
+                    IncomeExpense last = shot.getValue(IncomeExpense.class);
+                    if (last.getBucksString().equals(incExp)) {
+                        transaction.getlastTransaction(last);
+                        return;
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                //
+            }
+        };
+        mTransactionsRef.addListenerForSingleValueEvent(listener);
     }
 
     public void getTransactionsBwTwoDates(final TransactionsBetweenTwoDates bwTwoDates, String date1, String date2, String dateFormat) {
@@ -139,7 +165,7 @@ public class FirebaseTransactionsHelper {
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                //
             }
         };
 
