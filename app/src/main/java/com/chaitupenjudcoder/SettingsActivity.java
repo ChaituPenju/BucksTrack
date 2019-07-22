@@ -14,9 +14,9 @@ public class SettingsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_settings);
 
         if (findViewById(R.id.settings_fragment_container) != null) {
-            if (savedInstanceState != null) {
+            if (savedInstanceState != null)
                 return;
-            }
+
             getFragmentManager().beginTransaction().add(R.id.settings_fragment_container, new SettingsPreference()).commit();
         }
     }

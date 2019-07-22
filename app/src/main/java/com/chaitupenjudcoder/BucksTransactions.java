@@ -1,67 +1,73 @@
 package com.chaitupenjudcoder;
 
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.widget.Toast;
 
 import com.chaitupenjudcoder.buckstrack.R;
 import com.chaitupenjudcoder.buckstrack.databinding.ActivityBucksTransactionsBinding;
 import com.chaitupenjudcoder.datapojos.IncomeExpense;
+import com.chaitupenjudcoder.firebasehelpers.FirebaseTransactionsHelper;
+import com.chaitupenjudcoder.firebasehelpers.SharedPreferencesHelper;
 import com.chaitupenjudcoder.recyclerviews.BucksTransactionsRecycler;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Collections;
+
+import static com.chaitupenjudcoder.firebasehelpers.FirebaseTransactionsHelper.DATE_ONE_EXTRA;
+import static com.chaitupenjudcoder.firebasehelpers.FirebaseTransactionsHelper.DATE_TWO_EXTRA;
 
 public class BucksTransactions extends AppCompatActivity {
 
     ActivityBucksTransactionsBinding transactionUtil;
-    FirebaseDatabase dbTransactions;
-    FirebaseUser user;
-    DatabaseReference transacRef;
-    ArrayList<IncomeExpense> trans;
-    RecyclerView transactions;
+    RecyclerView rvTransactions;
     BucksTransactionsRecycler transactionRecycler;
+
+    FirebaseTransactionsHelper helper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         transactionUtil = DataBindingUtil.setContentView(this, R.layout.activity_bucks_transactions);
-        trans = new ArrayList<>();
-        user = FirebaseAuth.getInstance().getCurrentUser();
 
-        //interface with callback function to update the UI
-        getAllTransactions(new FirebaseCallBack() {
-            @Override
-            public void onCallBack(ArrayList<IncomeExpense> allTransactions) {
-                transactionRecycler = new BucksTransactionsRecycler(getApplicationContext(), allTransactions);
+        rvTransactions = transactionUtil.rvTransactions;
+        FirebaseTransactionsHelper transactionsHelper = new FirebaseTransactionsHelper();
+        String dateFormat = new SharedPreferencesHelper(getApplicationContext()).getDateFormatPref("dd-MM-yyyy");
 
-                transactions = transactionUtil.rvTransactions;
-                LinearLayoutManager manager = new LinearLayoutManager(getApplicationContext());
-                transactions.setLayoutManager(manager);
-                transactions.setHasFixedSize(true);
-                new ItemTouchHelper(swipeToDelete(allTransactions, transactionRecycler)).attachToRecyclerView(transactions);
-//                transactions.setAdapter(transactionRecycler);
-                transactionUtil.setTransactionAdapter(transactionRecycler);
+        Intent in = getIntent();
+        if (in.getExtras() != null) {
+            if ((in.getExtras().containsKey("WEEK") || in.getExtras().containsKey("MONTH"))) {
+                long days = in.getExtras().containsKey("WEEK") ? in.getExtras().getLong("WEEK") : in.getExtras().getLong(("MONTH"));
+                transactionsHelper.getWeekOrMonthTransactions(this::initTransasctionsRecycler, days);
+            } else if (in.getExtras().containsKey(DATE_ONE_EXTRA) && in.getExtras().containsKey(DATE_TWO_EXTRA)) {
+                String date1 = in.getExtras().getString(DATE_ONE_EXTRA);
+                String date2 = in.getExtras().getString(DATE_TWO_EXTRA);
+                transactionsHelper.getTransactionsBwTwoDates(this::initTransasctionsRecycler, date1, date2, dateFormat);
             }
-        });
+        } else {
+            transactionsHelper.getAllTransactions(this::initTransasctionsRecycler);
+        }
     }
 
-    private interface FirebaseCallBack {
-        void onCallBack(ArrayList<IncomeExpense> allTransactions);
+    private void initTransasctionsRecycler(ArrayList<IncomeExpense> transactions) {
+        Collections.sort(transactions, (d1, d2) -> d2.getDate().compareTo(d1.getDate()));
+        transactionRecycler = new BucksTransactionsRecycler(getApplicationContext(), transactions);
+        LinearLayoutManager manager = new LinearLayoutManager(getApplicationContext());
+        rvTransactions.setLayoutManager(manager);
+        rvTransactions.setHasFixedSize(true);
+        new ItemTouchHelper(swipeToDelete(transactions)).attachToRecyclerView(rvTransactions);
+        transactionUtil.setTransactionAdapter(transactionRecycler);
     }
 
-    private ItemTouchHelper.SimpleCallback swipeToDelete(final ArrayList<IncomeExpense> list, final BucksTransactionsRecycler recycler) {
-        ItemTouchHelper.SimpleCallback callback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT|ItemTouchHelper.LEFT){
+    private ItemTouchHelper.SimpleCallback swipeToDelete(final ArrayList<IncomeExpense> list) {
+        ItemTouchHelper.SimpleCallback callback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT | ItemTouchHelper.LEFT) {
 
             @Override
             public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder viewHolder1) {
@@ -70,32 +76,25 @@ public class BucksTransactions extends AppCompatActivity {
 
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
-                list.remove(viewHolder.getAdapterPosition());
-                recycler.notifyDataSetChanged();
+                confirmDeleteDialog(list, viewHolder.getAdapterPosition());
             }
         };
         return callback;
     }
 
-    private void getAllTransactions(final FirebaseCallBack callBack) {
-        dbTransactions = FirebaseDatabase.getInstance();
-        transacRef = dbTransactions.getReference("data/" + user.getUid());
-
-        ValueEventListener postListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot incomeExpenseShot : dataSnapshot.child("spendings").getChildren()) {
-                    IncomeExpense expenseIncome = incomeExpenseShot.getValue(IncomeExpense.class);
-                    trans.add(expenseIncome);
-                }
-                callBack.onCallBack(trans);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                //
-            }
-        };
-        transacRef.addValueEventListener(postListener);
+    private void confirmDeleteDialog(ArrayList<IncomeExpense> list, int position) {
+        AlertDialog.Builder confirmDelete = new AlertDialog.Builder(this)
+                .setMessage("Are you sure you want to delete transaction " + list.get(position).getTitle())
+                .setPositiveButton("OK", (dialog, which) -> {
+                    /*list.remove(position);
+                    transactionRecycler.notifyDataSetChanged();*/
+                    helper = new FirebaseTransactionsHelper();
+                    helper.deleteATransaction(response -> Toast.makeText(BucksTransactions.this, response, Toast.LENGTH_SHORT).show(), list.get(position).getId());
+                }).setNegativeButton("Don\'t delete", (dialog, which) -> {
+                    transactionRecycler.notifyDataSetChanged();
+                    dialog.dismiss();
+                });
+        AlertDialog confirmDeleteDialog = confirmDelete.create();
+        confirmDeleteDialog.show();
     }
 }

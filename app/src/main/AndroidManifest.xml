@@ -26,8 +26,12 @@
                 android:resource="@xml/bucks_track_widget_info" />
         </receiver>
 
+        <service android:name="com.chaitupenjudcoder.intentservices.BucksIntentService" />
+
+        <!-- Accessibility Setting for focussing on Edittext in Activity -->
         <activity
             android:name="com.chaitupenjudcoder.AddIncomeExpenseActivity"
+            android:windowSoftInputMode="stateVisible|adjustResize"
             android:parentActivityName="com.chaitupenjudcoder.BucksActivity" />
         <activity
             android:name="com.chaitupenjudcoder.BucksTransactions"
@@ -39,11 +43,15 @@
             android:name="com.chaitupenjudcoder.BucksActivity"
             android:label="@string/title_activity_bucks"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name="com.chaitupenjudcoder.SignUpActivity" />
-        <activity android:name="com.chaitupenjudcoder.LoginActivity">
+        <!-- Accessibility Setting for focussing on Edittext in Activity -->
+        <activity android:name="com.chaitupenjudcoder.SignUpActivity"
+        android:windowSoftInputMode="stateVisible|adjustResize" />
+        <!-- Accessibility Setting for focussing on Edittext in Activity -->
+        <activity android:name="com.chaitupenjudcoder.LoginActivity"
+            android:windowSoftInputMode="stateVisible|adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
+                <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

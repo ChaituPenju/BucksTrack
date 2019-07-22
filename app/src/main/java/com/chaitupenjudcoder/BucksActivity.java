@@ -3,6 +3,7 @@ package com.chaitupenjudcoder;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.databinding.DataBindingUtil;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -26,7 +27,9 @@ import android.widget.TextView;
 import com.chaitupenjudcoder.buckstrack.R;
 import com.chaitupenjudcoder.buckstrack.databinding.ActivityBucksBinding;
 import com.chaitupenjudcoder.datapojos.CategoriesAmount;
+import com.chaitupenjudcoder.firebasehelpers.BucksWidgetHelper;
 import com.chaitupenjudcoder.firebasehelpers.FirebaseCategoriesHelper;
+import com.chaitupenjudcoder.firebasehelpers.SharedPreferencesHelper;
 import com.chaitupenjudcoder.recyclerviews.BucksOverviewRecycler;
 import com.github.clans.fab.FloatingActionMenu;
 import com.google.firebase.auth.FirebaseAuth;
@@ -39,6 +42,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class BucksActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -46,6 +50,7 @@ public class BucksActivity extends AppCompatActivity
     com.github.clans.fab.FloatingActionButton incomeFab, expenseFab;
     FloatingActionMenu fab;
     ActivityBucksBinding bucks;
+    NavigationView navigationView;
 
     FirebaseAuth mAuth;
     FirebaseUser user;
@@ -53,6 +58,10 @@ public class BucksActivity extends AppCompatActivity
     private static final boolean BUCKS_INCOME = true;
     public static final String BUCKS_STRING_IS_INCOME_EXTRA = "income_extra";
     private static final boolean BUCKS_EXPENSE = false;
+
+    public static final String INCOME_EXPENSE_OBJECT_EXTRA = "income_expense_extra";
+    String currencySymbol;
+    int totalIncome, totalExpense;
 
     TextView username, usermail;
 
@@ -62,12 +71,17 @@ public class BucksActivity extends AppCompatActivity
     Spinner categories;
     RecyclerView rv_categories;
 
+    SharedPreferencesHelper h;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         bucks = DataBindingUtil.setContentView(this, R.layout.activity_bucks);
         PreferenceManager.setDefaultValues(this, R.xml.bucks_preferences, true);
+        h = new SharedPreferencesHelper(this);
+
+        new BucksWidgetHelper().callIntentService(this, h.getWidgetOptionPref("Last Income"));
 
         //get Firebase authentication instance and user
         mAuth = FirebaseAuth.getInstance();
@@ -85,36 +99,30 @@ public class BucksActivity extends AppCompatActivity
 
         Toolbar toolbar = findViewById(R.id.toolbar);
 
-        //floating action buttons for income and expense adding activities
+        //floating action buttons for rvIncome and rvExpense adding activities
         incomeFab = findViewById(R.id.fab_add_income);
         expenseFab = findViewById(R.id.fab_add_expnese);
 
         //fab on click listeners, opens same activity and changes title and data insertion of activity based on fab selection
-        incomeFab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                fab.close(true);
-                addIncExp = new Intent(new Intent(BucksActivity.this, AddIncomeExpenseActivity.class));
-                addIncExp.putExtra(BUCKS_STRING_IS_INCOME_EXTRA, BUCKS_INCOME);
-                startActivity(addIncExp);
-            }
+        incomeFab.setOnClickListener(v -> {
+            fab.close(true);
+            addIncExp = new Intent(new Intent(BucksActivity.this, AddIncomeExpenseActivity.class));
+            addIncExp.putExtra(BUCKS_STRING_IS_INCOME_EXTRA, BUCKS_INCOME);
+            startActivity(addIncExp);
         });
 
-        expenseFab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                fab.close(true);
-                addIncExp = new Intent(new Intent(BucksActivity.this, AddIncomeExpenseActivity.class));
-                addIncExp.putExtra(BUCKS_STRING_IS_INCOME_EXTRA, BUCKS_EXPENSE);
-                startActivity(addIncExp);
-            }
+        expenseFab.setOnClickListener(v -> {
+            fab.close(true);
+            addIncExp = new Intent(new Intent(BucksActivity.this, AddIncomeExpenseActivity.class));
+            addIncExp.putExtra(BUCKS_STRING_IS_INCOME_EXTRA, BUCKS_EXPENSE);
+            startActivity(addIncExp);
         });
 
         setSupportActionBar(toolbar);
         fab = findViewById(R.id.fab);
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView = findViewById(R.id.nav_view);
         //set first option as always checked
         navigationView.getMenu().getItem(0).setChecked(true);
 
@@ -139,27 +147,34 @@ public class BucksActivity extends AppCompatActivity
         setTotalIncomeAndExpense();
     }
 
-    //gets the total income and expense from firebase
+    //gets the total rvIncome and rvExpense from firebase
     private void setTotalIncomeAndExpense() {
         //  initialize categories helper class
         final FirebaseCategoriesHelper helper = new FirebaseCategoriesHelper();
 
         //  Get two totals one inside the other and set them to textviews
-        helper.getCategoryTotal(new FirebaseCategoriesHelper.GetCategoryTotal() {
-            @Override
-            public void categoriesTotal(final int total1) {
-                helper.getCategoryTotal(new FirebaseCategoriesHelper.GetCategoryTotal() {
-                    @Override
-                    public void categoriesTotal(int total2) {
-                        //set all the totals
-                        Resources res = getResources();
-                        income.setText(res.getString(R.string.indian_currency_symbol, total1));
-                        expense.setText(res.getString(R.string.indian_currency_symbol, total2));
-                        balance.setText(res.getString(R.string.indian_currency_symbol, total1 - total2));
-                    }
-                }, "expense");
-            }
-        }, "income");
+        helper.getCategoryTotal(total1 -> helper.getCategoryTotal(total2 -> {
+            totalIncome = total1;
+            totalExpense = total2;
+            //set all the totals
+            setCurrencyAndTotal(total1, total2);
+        }, "expense"), "income");
+    }
+
+    public void setCurrencyAndTotal(int totalIncome, int totalExpense) {
+        Resources res = getResources();
+        currencySymbol = h.getCurrencyPref("R");
+        income.setText(res.getString(R.string.currency_symbol, currencySymbol, totalIncome));
+        expense.setText(res.getString(R.string.currency_symbol, currencySymbol, totalExpense));
+        balance.setText(res.getString(R.string.currency_symbol, currencySymbol, totalIncome - totalExpense));
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //  set first option as always checked when app resumes or comes back from another activity
+        navigationView.getMenu().getItem(0).setChecked(true);
+        setCurrencyAndTotal(totalIncome, totalExpense);
     }
 
     @Override
@@ -186,14 +201,19 @@ public class BucksActivity extends AppCompatActivity
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
+        Intent in = new Intent(BucksActivity.this, BucksTransactions.class);
         //noinspection SimplifiableIfStatement
         switch (id) {
             case R.id.action_week:
+                in.putExtra("WEEK", 7L);
+                startActivity(in);
                 return true;
             case R.id.action_month:
+                in.putExtra("MONTH", 30L);
+                startActivity(in);
                 return true;
             case R.id.action_date_range:
-                startActivity(new Intent(BucksActivity.this, DateChooserActivity.class));
+                startActivity(new Intent(new Intent(BucksActivity.this, DateChooserActivity.class)));
                 return true;
         }
 
@@ -240,17 +260,9 @@ public class BucksActivity extends AppCompatActivity
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, final int position, long id) {
 
-                categoriesHelper.getCategoryTotal(new FirebaseCategoriesHelper.GetCategoryTotal() {
-                    @Override
-                    public void categoriesTotal(final int total) {
+                categoriesHelper.getCategoryTotal(total -> {
 //                        Log.d("abcde", "inside categories total"+total);
-                        categoriesHelper.getAllCategories(new FirebaseCategoriesHelper.GetAllCategory() {
-                            @Override
-                            public void categories(ArrayList<String> categoriesList) {
-                                getIncomeExpenseCategoriesTotal(categoriesList, total);
-                            }
-                        }, categorie[position].toLowerCase());
-                    }
+                    categoriesHelper.getAllCategories(categoriesList -> getIncomeExpenseCategoriesTotal(categoriesList, total), categorie[position].toLowerCase());
                 }, categorie[position].toLowerCase());
             }
 
@@ -280,6 +292,11 @@ public class BucksActivity extends AppCompatActivity
                     }
                     catAmount.add(new CategoriesAmount(category, String.valueOf(amounts[cnt]), ((float) amounts[cnt] / total) * 100));
                     cnt++;
+                }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    catAmount.sort((CategoriesAmount first, CategoriesAmount second) -> (int) (second.getPercentage() - first.getPercentage()));
+                } else {
+                    Collections.sort(catAmount, (o1, o2) -> (int) (o2.getPercentage() - o1.getPercentage()));
                 }
                 BucksOverviewRecycler overviewRecycler = new BucksOverviewRecycler(getApplicationContext(), catAmount);
                 RecyclerView.LayoutManager manager = new LinearLayoutManager(getApplicationContext());

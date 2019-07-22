@@ -3,6 +3,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <data>
+        <variable
+            name="incExpTransac"
+            type="com.chaitupenjudcoder.datapojos.IncomeExpense" />
+
+        <variable name="transactionClickListener"
+            type="com.chaitupenjudcoder.recyclerviews.BucksTransactionsRecycler.BucksTransactionsAdapter"/>
+    </data>
+
     <android.support.v7.widget.CardView
         android:id="@+id/cv_transactions"
         android:animateLayoutChanges="true"
@@ -12,6 +21,7 @@
         app:cardCornerRadius="@dimen/cardview_default_radius"
         android:layout_margin="8dp"
         android:clickable="true"
+        android:onClick="@{()->transactionClickListener.updateTransaction(incExpTransac)}"
         android:foreground="?android:attr/selectableItemBackground">
 
         <LinearLayout
@@ -20,6 +30,7 @@
             android:baselineAligned="false"
             android:orientation="horizontal"
             android:padding="8dp">
+            <!--android:onClick="@{()->transactionClickListener.updateTransaction(incExpTransac)}">-->
 
                 <FrameLayout
                     android:layout_width="0dp"
@@ -31,7 +42,7 @@
                         style="@style/TextAppearance.AppCompat.Headline"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="hello world"/>
+                        android:text="@{incExpTransac.title, default=Title}"/>
 
                     <TextView
                         android:id="@+id/tv_category"
@@ -40,7 +51,7 @@
                         android:textStyle="bold"
                         android:textColor="#000"
                         android:layout_gravity="center_vertical|end"
-                        android:text="hello world"/>
+                        android:text="@{incExpTransac.category, default=category}"/>
 
                     <TextView
                         android:id="@+id/tv_amount"
@@ -48,7 +59,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         style="@style/TextAppearance.AppCompat.Large"
-                        android:text="hello world"/>
+                        android:text="@{incExpTransac.amount, default=amount}"/>
                 </FrameLayout>
 
 
@@ -62,10 +73,14 @@
                         android:id="@+id/tv_description"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginLeft="4dp"
+                        android:layout_marginStart="4dp"
                         style="@style/TextAppearance.AppCompat.Body2"
+                        android:ellipsize="end"
+                        android:maxLines="2"
                         android:gravity="end"
-                        android:ems="5"
-                        android:text="hello world"/>
+                        android:ems="1"
+                        android:text="@{incExpTransac.note, default=description}"/>
 
                     <TextView
                         android:id="@+id/tv_date"
@@ -74,14 +89,11 @@
                         style="@style/TextAppearance.AppCompat.Widget.DropDownItem"
                         android:layout_gravity="bottom"
                         android:gravity="end"
-                        android:text="hello worldd"/>
+                        android:text="@{incExpTransac.date, default=date}"/>
 
                 </FrameLayout>
 
         </LinearLayout>
     </android.support.v7.widget.CardView>
-    <data>
-
-    </data>
 
 </layout>
