@@ -1,0 +1,179 @@
+{
+  "data" : {
+    "VYOLSotNJAbfSfzOR73hScnuE6z1" : {
+      "categories" : {
+        "expense" : {
+          "-MHuRCN0rGT-5s9Vb5p8" : "food",
+          "-MHuRCN0rGT-5s9Vb5p9" : "travel",
+          "-MHuRCN0rGT-5s9Vb5pA" : "shopping",
+          "-MHuRCN0rGT-5s9Vb5pB" : "entertainment"
+        },
+        "income" : {
+          "-MHuRCMzarA9761JfdAh" : "salary",
+          "-MHuRCMzarA9761JfdAi" : "loan",
+          "-MHuRCMzarA9761JfdAj" : "lottery"
+        }
+      },
+      "spendings" : {
+        "-MHuUHGswvWhX3aP1GIY" : {
+          "amount" : "556",
+          "bucksString" : "income",
+          "category" : "salary",
+          "date" : "08-09-2020",
+          "formattedDate" : "08-09-2020",
+          "id" : "-MHuUHGswvWhX3aP1GIY",
+          "note" : "salary got hike example",
+          "title" : "Salary hike"
+        },
+        "-MHuUP-iZA4JvvmB9HSt" : {
+          "amount" : "659",
+          "bucksString" : "income",
+          "category" : "loan",
+          "date" : "10-09-2020",
+          "formattedDate" : "10-09-2020",
+          "id" : "-MHuUP-iZA4JvvmB9HSt",
+          "note" : "got loan from hr",
+          "title" : "Got hr loan"
+        },
+        "-MHuUXB0C4jYUDrhaF0E" : {
+          "amount" : "399",
+          "bucksString" : "expense",
+          "category" : "food",
+          "date" : "15-09-2020",
+          "formattedDate" : "15/09/2020",
+          "id" : "-MHuUXB0C4jYUDrhaF0E",
+          "note" : "Domino's 🍕 eating example",
+          "title" : "Pizza eat edit"
+        },
+        "-MHuUd3HOb8d41TieAYQ" : {
+          "amount" : "358",
+          "bucksString" : "expense",
+          "category" : "shopping",
+          "date" : "14-09-2020",
+          "formattedDate" : "14-09-2020",
+          "id" : "-MHuUd3HOb8d41TieAYQ",
+          "note" : "bought new shoes ",
+          "title" : "New shoes"
+        },
+        "-MHuc0NuMkfyAoD1Fl0d" : {
+          "amount" : "700",
+          "bucksString" : "income",
+          "category" : "lottery",
+          "date" : "15-09-2020",
+          "formattedDate" : "15-09-2020",
+          "id" : "-MHuc0NuMkfyAoD1Fl0d",
+          "note" : "Sikkim bumper lottery test",
+          "title" : "Bumper lottery"
+        },
+        "-MHucQRlMGW9ltIOYP3T" : {
+          "amount" : "400",
+          "bucksString" : "expense",
+          "category" : "entertainment",
+          "date" : "21-09-2020",
+          "formattedDate" : "21/09/2020",
+          "id" : "-MHucQRlMGW9ltIOYP3T",
+          "note" : "watched Avengers movie pvr",
+          "title" : "Avengers infini"
+        },
+        "-MHucZOGaJJ_yMLAIyUp" : {
+          "amount" : "650",
+          "bucksString" : "expense",
+          "category" : "travel",
+          "date" : "21-09-2020",
+          "formattedDate" : "21/09/2020",
+          "id" : "-MHucZOGaJJ_yMLAIyUp",
+          "note" : "going home to hometown",
+          "title" : "Home travels"
+        }
+      }
+    },
+    "iPMGEQjF9eSYGBMD48ZnmthDyJr2" : {
+      "categories" : {
+        "Income" : {
+          "-MHtgqKx8HzJKvbkrHzY" : "abcd"
+        },
+        "expense" : {
+          "-MHtg1Vv23EUcHTbQY5H" : "food",
+          "-MHtg1Vv23EUcHTbQY5I" : "travel",
+          "-MHtg1Vv23EUcHTbQY5J" : "shopping",
+          "-MHtg1Vv23EUcHTbQY5K" : "entertainment"
+        },
+        "income" : {
+          "-MHtg1VtIdEMcCPjhTt_" : "salary",
+          "-MHtg1VucZ4kFg4NZ63G" : "loan",
+          "-MHtg1VucZ4kFg4NZ63H" : "lottery"
+        }
+      },
+      "spendings" : {
+        "-MHth9zC3vb-2UgzsmE5" : {
+          "amount" : "100",
+          "bucksString" : "income",
+          "category" : "loan",
+          "date" : "10-09-2020",
+          "id" : "-MHth9zC3vb-2UgzsmE5",
+          "note" : "test loan of 100 rupees",
+          "title" : "Test incum"
+        },
+        "-MHthPQT92m4nw4ThHjf" : {
+          "amount" : "199",
+          "bucksString" : "expense",
+          "category" : "shopping",
+          "date" : "20-09-2020",
+          "id" : "-MHthPQT92m4nw4ThHjf",
+          "note" : "bought new items",
+          "title" : "Test expense"
+        },
+        "-MHthX20rlZbWOqc4tkv" : {
+          "amount" : "145",
+          "bucksString" : "expense",
+          "category" : "travel",
+          "date" : "14-09-2020",
+          "id" : "-MHthX20rlZbWOqc4tkv",
+          "note" : "travelled to home edit",
+          "title" : "Travel test edt"
+        },
+        "-MHthf6w91K99X7kZpcE" : {
+          "amount" : "1000",
+          "bucksString" : "income",
+          "category" : "lottery",
+          "date" : "20-09-2020",
+          "id" : "-MHthf6w91K99X7kZpcE",
+          "note" : "lottery description test",
+          "title" : "I got lottery"
+        },
+        "-MHtiH_rAs7fHTOpBpxN" : {
+          "amount" : "340",
+          "bucksString" : "income",
+          "category" : "salary",
+          "date" : "21-09-2020",
+          "id" : "-MHtiH_rAs7fHTOpBpxN",
+          "note" : "salary hike extra got",
+          "title" : "Got hike"
+        },
+        "-MHtiVm1Et_HR68-BT0o" : {
+          "amount" : "249",
+          "bucksString" : "expense",
+          "category" : "food",
+          "date" : "15-09-2020",
+          "id" : "-MHtiVm1Et_HR68-BT0o",
+          "note" : "got to eat Domino's 🍕",
+          "title" : "Got pizza"
+        }
+      }
+    }
+  },
+  "users" : {
+    "VYOLSotNJAbfSfzOR73hScnuE6z1" : {
+      "created" : "1600855789",
+      "email" : "chaituandroidev@email.com",
+      "last_login" : "1600856454",
+      "name" : "chaitu penju"
+    },
+    "iPMGEQjF9eSYGBMD48ZnmthDyJr2" : {
+      "created" : "1600843162",
+      "email" : "chaitupenju.androiddev@gmail.com",
+      "last_login" : "1600843347",
+      "name" : "chaitu penju"
+    }
+  }
+}
