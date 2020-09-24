@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import com.chaitupenjudcoder.buckstrack.R;
 import com.chaitupenjudcoder.firebasehelpers.BucksWidgetHelper;
+import com.chaitupenjudcoder.firebasehelpers.SharedPreferencesHelper;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -27,6 +28,7 @@ public class SettingsPreference extends PreferenceFragment {
     private SharedPreferences.OnSharedPreferenceChangeListener bucksPreferenceListener;
 
     public static final String CURRENCY_KEY = "currency_key";
+    public static final String PREVIOUS_DATE_FORMAT_KEY = "previous_date_format_key";
     public static final String DATE_FORMAT_KEY = "date_format_key";
     public static final String WIDGET_OPTION_KEY = "widget_option_key";
 
@@ -51,6 +53,8 @@ public class SettingsPreference extends PreferenceFragment {
                 currencyPref.setSummary(sharedPreferences.getString(key, "what") + " currency selected");
             }
             if (key.equals(DATE_FORMAT_KEY)) {
+//                sharedPreferences.edit().putString(PREVIOUS_DATE_FORMAT_KEY, sharedPreferences.getString(key, "dd-mm-yyyy")).apply();
+                new SharedPreferencesHelper(SettingsPreference.this.getActivity()).setPreviousDateFormatPref();
                 dateFormatPref.setSummary(sharedPreferences.getString(key, "dd-mm-yyyy") + " format selected");
             }
             if (key.equals(WIDGET_OPTION_KEY)) {

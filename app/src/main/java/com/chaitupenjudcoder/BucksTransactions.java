@@ -90,6 +90,7 @@ public class BucksTransactions extends AppCompatActivity {
                     transactionRecycler.notifyDataSetChanged();*/
                     helper = new FirebaseTransactionsHelper();
                     helper.deleteATransaction(response -> Toast.makeText(BucksTransactions.this, response, Toast.LENGTH_SHORT).show(), list.get(position).getId());
+                    transactionRecycler.notifyDataSetChanged();
                 }).setNegativeButton("Don\'t delete", (dialog, which) -> {
                     transactionRecycler.notifyDataSetChanged();
                     dialog.dismiss();

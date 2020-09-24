@@ -210,6 +210,7 @@ public class FirebaseTransactionsHelper {
         ValueEventListener postListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                transactions.clear();
                 for (DataSnapshot incomeExpenseShot : dataSnapshot.getChildren()) {
                     IncomeExpense expenseIncome = incomeExpenseShot.getValue(IncomeExpense.class);
                     transactions.add(expenseIncome);

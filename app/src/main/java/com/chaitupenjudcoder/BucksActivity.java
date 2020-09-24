@@ -133,6 +133,7 @@ public class BucksActivity extends AppCompatActivity
         //handles nullpointer exception and sets the value
         if (user != null) {
             for (UserInfo info : user.getProviderData()) {
+                System.out.println("Display Name is " + info.getDisplayName());
                 username.setText(info.getDisplayName());
                 usermail.setText(info.getEmail());
             }

@@ -47,7 +47,7 @@ public class BucksTransactionsRecycler extends RecyclerView.Adapter<BucksTransac
     public void onBindViewHolder(@NonNull BucksTransactionsAdapter bucksTransactionsAdapter, int i) {
         bucksTransactionsAdapter.itemViewBinding.cvTransactions.setAnimation(AnimationUtils.loadAnimation(cxt, R.anim.transaction_card_scale_animation));
         IncomeExpense ie = allTransactions.get(i);
-        ie.setDate(new SharedPreferencesHelper(cxt).convertDate(ie.getDate()));
+        ie.setDateFormat(new SharedPreferencesHelper(cxt).getDateFormatPref("dd-MM-yyyy"));
         bucksTransactionsAdapter.bind(ie);
         bucksTransactionsAdapter.itemViewBinding.setTransactionClickListener(bucksTransactionsAdapter);
     }

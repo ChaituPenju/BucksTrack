@@ -2,6 +2,7 @@ package com.chaitupenjudcoder;
 
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Patterns;
@@ -11,6 +12,8 @@ import com.chaitupenjudcoder.buckstrack.R;
 import com.chaitupenjudcoder.buckstrack.databinding.ActivitySignUpBinding;
 import com.chaitupenjudcoder.datapojos.User;
 import com.chaitupenjudcoder.firebasehelpers.BucksInputValidationHelper;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseUser;
@@ -75,7 +78,7 @@ public class SignUpActivity extends AppCompatActivity {
             return;
         }
 
-        if (validationHelper.passwordValidator(passwordLout, confirmLout)) {
+        if (!validationHelper.passwordValidator(passwordLout, confirmLout)) {
             return;
         }
         String email = signupUtil.etEmail.getText().toString();
@@ -93,17 +96,22 @@ public class SignUpActivity extends AppCompatActivity {
                 String userID = user.getUid();
                 //get user display name
                 String displayName = signupUtil.etFullname.getText().toString();
-                //set user display name
-                UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder().setDisplayName(displayName).build();
-                //update user profile
-                user.updateProfile(profileUpdates);
+                //set login time milliseconds
                 Long tsLong = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis());
                 String ts = tsLong.toString();
                 User userObj = new User(signupUtil.etEmail.getText().toString(), signupUtil.etFullname.getText().toString(), ts, ts);
                 mReference1.child(userID).setValue(userObj);
                 initFirebaseData(userID);
-                Toast.makeText(SignUpActivity.this, "SignUp Successful", Toast.LENGTH_SHORT).show();
-                finish();
+                //set user display name
+                UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder().setDisplayName(displayName).build();
+                //update user profile
+                user.updateProfile(profileUpdates).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        Toast.makeText(SignUpActivity.this, "SignUp Successful", Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+                });
             } else {
                 if (task.getException() instanceof FirebaseAuthUserCollisionException) {
                     Toast.makeText(SignUpActivity.this, "Email Id is Already Registered", Toast.LENGTH_SHORT).show();

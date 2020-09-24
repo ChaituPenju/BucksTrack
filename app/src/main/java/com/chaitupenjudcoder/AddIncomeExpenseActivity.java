@@ -18,6 +18,7 @@ import com.chaitupenjudcoder.datapojos.IncomeExpense;
 import com.chaitupenjudcoder.firebasehelpers.BucksInputValidationHelper;
 import com.chaitupenjudcoder.firebasehelpers.FirebaseCategoriesHelper;
 import com.chaitupenjudcoder.firebasehelpers.FirebaseTransactionsHelper;
+import com.chaitupenjudcoder.firebasehelpers.SharedPreferencesHelper;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -134,6 +135,7 @@ public class AddIncomeExpenseActivity extends AppCompatActivity {
 
         //  create an instance of addincomeexpense object to push
         incExp = new IncomeExpense(titleStr, amountStr, dateStr, descriptionStr, categoryStr, BUCKS_STRING);
+        incExp.setDateFormat(new SharedPreferencesHelper(AddIncomeExpenseActivity.this).getDateFormatPref("dd-MM-yyyy"));
 
         //  update transaction if it shows from update
         if (getIntent().getExtras() != null && getIntent().getExtras().containsKey(INCOME_EXPENSE_OBJECT_EXTRA)) {

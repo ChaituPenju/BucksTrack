@@ -3,6 +3,11 @@ package com.chaitupenjudcoder.datapojos;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 public class IncomeExpense implements Parcelable {
     private String title;
     private String amount;
@@ -11,6 +16,8 @@ public class IncomeExpense implements Parcelable {
     private String category;
     private String bucksString;
     private String id;
+
+    private String dateFormatFromPreference;
 
     public IncomeExpense() {
     }
@@ -42,6 +49,22 @@ public class IncomeExpense implements Parcelable {
 
     public String getDate() {
         return date;
+    }
+
+    public void setDateFormat(String dateFormatFromPreference) {
+        this.dateFormatFromPreference = dateFormatFromPreference;
+    }
+
+    public String getFormattedDate() {
+        SimpleDateFormat format1 = new SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH);
+        SimpleDateFormat format2 = new SimpleDateFormat(dateFormatFromPreference, Locale.ENGLISH);
+        Date date = null;
+        try {
+            date = format1.parse(this.date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return format2.format(date);
     }
 
     public String getNote() {

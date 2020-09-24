@@ -89,7 +89,7 @@
                         style="@style/TextAppearance.AppCompat.Widget.DropDownItem"
                         android:layout_gravity="bottom"
                         android:gravity="end"
-                        android:text="@{incExpTransac.date, default=date}"/>
+                        android:text="@{incExpTransac.formattedDate, default=date}"/>
 
                 </FrameLayout>
 

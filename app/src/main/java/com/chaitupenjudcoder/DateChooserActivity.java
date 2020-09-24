@@ -55,7 +55,8 @@ public class DateChooserActivity extends AppCompatActivity {
 
         DatePickerDialog datePick = new DatePickerDialog(DateChooserActivity.this, (view, year1, month1, dayOfMonth1) -> {
             //something
-            String date = new SharedPreferencesHelper(DateChooserActivity.this).convertDate(getResources().getString(R.string.date_format_string, dayOfMonth1, (month1 + 1), year1));
+            c.set(year1, month1, dayOfMonth1);
+            String date = new SharedPreferencesHelper(DateChooserActivity.this).convertDate(c.getTime());
             et.setText(date);
         }, year, month, dayOfMonth);
 
