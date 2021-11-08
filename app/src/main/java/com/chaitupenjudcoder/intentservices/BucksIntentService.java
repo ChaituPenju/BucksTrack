@@ -3,7 +3,7 @@ package com.chaitupenjudcoder.intentservices;
 import android.app.IntentService;
 import android.appwidget.AppWidgetManager;
 import android.content.Intent;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.util.Log;
 import android.widget.RemoteViews;
 

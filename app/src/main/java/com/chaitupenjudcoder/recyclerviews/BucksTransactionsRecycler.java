@@ -2,12 +2,11 @@ package com.chaitupenjudcoder.recyclerviews;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
-import android.widget.Toast;
 
 import com.chaitupenjudcoder.AddIncomeExpenseActivity;
 import com.chaitupenjudcoder.buckstrack.R;
@@ -15,11 +14,7 @@ import com.chaitupenjudcoder.buckstrack.databinding.ItemSpendingListBinding;
 import com.chaitupenjudcoder.datapojos.IncomeExpense;
 import com.chaitupenjudcoder.firebasehelpers.SharedPreferencesHelper;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Locale;
 
 import static com.chaitupenjudcoder.BucksActivity.BUCKS_STRING_IS_INCOME_EXTRA;
 import static com.chaitupenjudcoder.BucksActivity.INCOME_EXPENSE_OBJECT_EXTRA;
