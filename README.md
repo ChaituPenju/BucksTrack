@@ -7,6 +7,8 @@ BucksTrack is an Android Application to track all the expenses of money on the g
 
 - The datastructure [json](https://raw.githubusercontent.com/ChaituPenju/BucksTrack/master/buckstrack_datastructure.json) of app's data for firebase realtime database.
 
+- Recently Migrated to AndroidX with one of latest gradle version (6.8.3). Refer the branch `update-to-androidx-and-gradle`
+
 ***Concepts Covered***
 - Clean and Neat Code
 - Extensive DataBinding
