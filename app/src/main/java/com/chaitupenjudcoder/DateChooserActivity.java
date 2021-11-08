@@ -2,21 +2,17 @@ package com.chaitupenjudcoder;
 
 import android.app.DatePickerDialog;
 import android.content.Intent;
-import android.databinding.DataBindingUtil;
+import androidx.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.chaitupenjudcoder.buckstrack.R;
 import com.chaitupenjudcoder.buckstrack.databinding.ActivityDateChooserBinding;
-import com.chaitupenjudcoder.firebasehelpers.FirebaseTransactionsHelper;
 import com.chaitupenjudcoder.firebasehelpers.SharedPreferencesHelper;
 
-import java.text.ParseException;
 import java.util.Calendar;
 
-import static com.chaitupenjudcoder.firebasehelpers.FirebaseTransactionsHelper.BETWEEN_TWO_DATES_EXTRA;
 import static com.chaitupenjudcoder.firebasehelpers.FirebaseTransactionsHelper.DATE_ONE_EXTRA;
 import static com.chaitupenjudcoder.firebasehelpers.FirebaseTransactionsHelper.DATE_TWO_EXTRA;
 

@@ -7,7 +7,7 @@
 
     </data>
 
-    <android.support.v4.widget.NestedScrollView
+    <androidx.core.widget.NestedScrollView
         android:id="@+id/activity_categories"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -30,7 +30,7 @@
                 android:text="@string/income_categories_text"
                 android:textStyle="bold" />
 
-            <android.support.v7.widget.RecyclerView
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_income"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
@@ -51,7 +51,7 @@
                 android:text="@string/expense_categories_list"
                 android:textStyle="bold" />
 
-            <android.support.v7.widget.RecyclerView
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_expense"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
@@ -64,6 +64,6 @@
                 android:text="@string/categories_button_add_text"/>
 
         </LinearLayout>
-    </android.support.v4.widget.NestedScrollView>
+    </androidx.core.widget.NestedScrollView>
 
 </layout>
