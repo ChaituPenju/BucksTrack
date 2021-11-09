@@ -1,16 +1,13 @@
-package com.chaitupenjudcoder;
+package com.chaitupenjudcoder
 
-import android.app.Application;
+import android.app.Application
+import com.google.firebase.database.FirebaseDatabase
 
-import com.google.firebase.database.FirebaseDatabase;
-
-public class BucksTrackOffline extends Application {
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
+class BucksTrackOffline : Application() {
+    override fun onCreate() {
+        super.onCreate()
 
         //  set the firebase database persistence to true for saving offline
-        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+        FirebaseDatabase.getInstance().setPersistenceEnabled(true)
     }
 }

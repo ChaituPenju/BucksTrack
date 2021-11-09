@@ -1,124 +1,43 @@
-package com.chaitupenjudcoder.datapojos;
+package com.chaitupenjudcoder.datapojos
 
-import android.os.Parcel;
-import android.os.Parcelable;
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+import java.text.ParseException
+import java.text.SimpleDateFormat
+import java.util.*
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
+@Parcelize
+data class IncomeExpense(
+    var title: String,
+    var amount: String,
+    var date: String,
+    var note: String,
+    var category: String,
+    var bucksString: String,
+    var id: String? = "0"
+): Parcelable {
+    private var dateFormatFromPreference: String? = null
 
-public class IncomeExpense implements Parcelable {
-    private String title;
-    private String amount;
-    private String date;
-    private String note;
-    private String category;
-    private String bucksString;
-    private String id;
+    // Default No-Arg Constructor for Firebase
+    constructor() : this("", "",
+        "", "", "",
+        "", ""
+    )
 
-    private String dateFormatFromPreference;
-
-    public IncomeExpense() {
+    fun setDateFormat(dateFormatFromPreference: String?) {
+        this.dateFormatFromPreference = dateFormatFromPreference
     }
 
-    public IncomeExpense(String title, String amount, String date, String note, String category, String bucksString) {
-        this.title = title;
-        this.amount = amount;
-        this.date = date;
-        this.note = note;
-        this.category = category;
-        this.bucksString = bucksString;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public void setDate(String date) {
-        this.date = date;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public String getAmount() {
-        return amount;
-    }
-
-    public String getDate() {
-        return date;
-    }
-
-    public void setDateFormat(String dateFormatFromPreference) {
-        this.dateFormatFromPreference = dateFormatFromPreference;
-    }
-
-    public String getFormattedDate() {
-        SimpleDateFormat format1 = new SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH);
-        SimpleDateFormat format2 = new SimpleDateFormat(dateFormatFromPreference, Locale.ENGLISH);
-        Date date = null;
-        try {
-            date = format1.parse(this.date);
-        } catch (ParseException e) {
-            e.printStackTrace();
+    val formattedDate: String
+        get() {
+            val format1 = SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH)
+            val format2 = SimpleDateFormat(dateFormatFromPreference, Locale.ENGLISH)
+            var date: Date? = null
+            try {
+                date = format1.parse(this.date)
+            } catch (e: ParseException) {
+                e.printStackTrace()
+            }
+            return format2.format(date)
         }
-        return format2.format(date);
-    }
-
-    public String getNote() {
-        return note;
-    }
-
-    public String getCategory() {
-        return category;
-    }
-
-    public String getBucksString() {
-        return bucksString;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    protected IncomeExpense(Parcel in) {
-        title = in.readString();
-        amount = in.readString();
-        date = in.readString();
-        note = in.readString();
-        category = in.readString();
-        bucksString = in.readString();
-        id = in.readString();
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(title);
-        dest.writeString(amount);
-        dest.writeString(date);
-        dest.writeString(note);
-        dest.writeString(category);
-        dest.writeString(bucksString);
-        dest.writeString(id);
-    }
-
-    @SuppressWarnings("unused")
-    public static final Parcelable.Creator<IncomeExpense> CREATOR = new Parcelable.Creator<IncomeExpense>() {
-        @Override
-        public IncomeExpense createFromParcel(Parcel in) {
-            return new IncomeExpense(in);
-        }
-
-        @Override
-        public IncomeExpense[] newArray(int size) {
-            return new IncomeExpense[size];
-        }
-    };
 }
