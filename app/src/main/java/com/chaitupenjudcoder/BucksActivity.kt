@@ -1,318 +1,281 @@
-package com.chaitupenjudcoder;
+package com.chaitupenjudcoder
 
-import android.content.Intent;
-import android.content.res.Resources;
-import androidx.databinding.DataBindingUtil;
-import android.os.Build;
-import android.os.Bundle;
-import android.preference.PreferenceManager;
-import androidx.annotation.NonNull;
-import com.google.android.material.navigation.NavigationView;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.appcompat.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.animation.AnimationUtils;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
-import android.widget.TextView;
+import android.content.Intent
+import android.os.Build
+import android.os.Bundle
+import android.preference.PreferenceManager
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
+import android.view.animation.AnimationUtils
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.GravityCompat
+import androidx.databinding.DataBindingUtil
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.chaitupenjudcoder.buckstrack.R
+import com.chaitupenjudcoder.buckstrack.databinding.ActivityBucksBinding
+import com.chaitupenjudcoder.buckstrack.databinding.ContentBucksBinding
+import com.chaitupenjudcoder.buckstrack.databinding.NavHeaderBucksBinding
+import com.chaitupenjudcoder.datapojos.CategoriesAmount
+import com.chaitupenjudcoder.firebasehelpers.BucksWidgetHelper
+import com.chaitupenjudcoder.firebasehelpers.FirebaseCategoriesHelper
+import com.chaitupenjudcoder.firebasehelpers.SharedPreferencesHelper
+import com.chaitupenjudcoder.recyclerviews.BucksOverviewRecycler
+import com.google.android.material.navigation.NavigationView
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.database.*
+import java.util.*
 
-import com.chaitupenjudcoder.buckstrack.R;
-import com.chaitupenjudcoder.buckstrack.databinding.ActivityBucksBinding;
-import com.chaitupenjudcoder.datapojos.CategoriesAmount;
-import com.chaitupenjudcoder.firebasehelpers.BucksWidgetHelper;
-import com.chaitupenjudcoder.firebasehelpers.FirebaseCategoriesHelper;
-import com.chaitupenjudcoder.firebasehelpers.SharedPreferencesHelper;
-import com.chaitupenjudcoder.recyclerviews.BucksOverviewRecycler;
-import com.github.clans.fab.FloatingActionMenu;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.UserInfo;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
+class BucksActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
-import java.util.ArrayList;
-import java.util.Collections;
+    private lateinit var bucksBinding: ActivityBucksBinding
+    private lateinit var navHeader: NavHeaderBucksBinding
+    lateinit var bucksContent: ContentBucksBinding
 
-public class BucksActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+    private var mAuth: FirebaseAuth = FirebaseAuth.getInstance()
+    private lateinit var user: FirebaseUser
+    var currencySymbol: String? = null
+    var totalIncome = 0
+    var totalExpense = 0
 
-    com.github.clans.fab.FloatingActionButton incomeFab, expenseFab;
-    FloatingActionMenu fab;
-    ActivityBucksBinding bucks;
-    NavigationView navigationView;
+    var h: SharedPreferencesHelper? = null
 
-    FirebaseAuth mAuth;
-    FirebaseUser user;
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
-    private static final boolean BUCKS_INCOME = true;
-    public static final String BUCKS_STRING_IS_INCOME_EXTRA = "income_extra";
-    private static final boolean BUCKS_EXPENSE = false;
-
-    public static final String INCOME_EXPENSE_OBJECT_EXTRA = "income_expense_extra";
-    String currencySymbol;
-    int totalIncome, totalExpense;
-
-    TextView username, usermail;
-
-    TextView income, expense, balance;
-    Intent addIncExp;
-
-    Spinner categories;
-    RecyclerView rv_categories;
-
-    SharedPreferencesHelper h;
+        bucksBinding = DataBindingUtil.setContentView(this, R.layout.activity_bucks)
+        navHeader = NavHeaderBucksBinding.bind(bucksBinding.navView.getHeaderView(0))
+        bucksContent = bucksBinding.appBarLayout.contentBucks
 
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        bucks = DataBindingUtil.setContentView(this, R.layout.activity_bucks);
-        PreferenceManager.setDefaultValues(this, R.xml.bucks_preferences, true);
-        h = new SharedPreferencesHelper(this);
+        PreferenceManager.setDefaultValues(this, R.xml.bucks_preferences, true)
+        h = SharedPreferencesHelper(this)
+        BucksWidgetHelper().callIntentService(this, h!!.getWidgetOptionPref("Last Income"))
 
-        new BucksWidgetHelper().callIntentService(this, h.getWidgetOptionPref("Last Income"));
+
 
         //get Firebase authentication instance and user
-        mAuth = FirebaseAuth.getInstance();
-        user = mAuth.getCurrentUser();
+        user = mAuth.currentUser!!
 
-        income = findViewById(R.id.tv_income_amount);
-        expense = findViewById(R.id.tv_expense_amount);
-        balance = findViewById(R.id.tv_balance_amount);
-
-        categories = findViewById(R.id.spi_categories_choose);
         // populate spinner function which populates with two classifications of categories
-        populateCategorySpinner();
+        populateCategorySpinner()
 
-        rv_categories = findViewById(R.id.rv_categories_amount);
-
-        Toolbar toolbar = findViewById(R.id.toolbar);
-
-        //floating action buttons for rvIncome and rvExpense adding activities
-        incomeFab = findViewById(R.id.fab_add_income);
-        expenseFab = findViewById(R.id.fab_add_expnese);
+        lateinit var addIncExp: Intent
 
         //fab on click listeners, opens same activity and changes title and data insertion of activity based on fab selection
-        incomeFab.setOnClickListener(v -> {
-            fab.close(true);
-            addIncExp = new Intent(new Intent(BucksActivity.this, AddIncomeExpenseActivity.class));
-            addIncExp.putExtra(BUCKS_STRING_IS_INCOME_EXTRA, BUCKS_INCOME);
-            startActivity(addIncExp);
-        });
+        bucksBinding.appBarLayout.fabAddIncome.setOnClickListener {
+            bucksBinding.appBarLayout.fab.close(true)
+            addIncExp = Intent(Intent(this@BucksActivity, AddIncomeExpenseActivity::class.java))
+            addIncExp.putExtra(BUCKS_STRING_IS_INCOME_EXTRA, BUCKS_INCOME)
+            startActivity(addIncExp)
+        }
 
-        expenseFab.setOnClickListener(v -> {
-            fab.close(true);
-            addIncExp = new Intent(new Intent(BucksActivity.this, AddIncomeExpenseActivity.class));
-            addIncExp.putExtra(BUCKS_STRING_IS_INCOME_EXTRA, BUCKS_EXPENSE);
-            startActivity(addIncExp);
-        });
+        bucksBinding.appBarLayout.fabAddExpnese.setOnClickListener {
+            bucksBinding.appBarLayout.fab.close(true)
+            addIncExp = Intent(Intent(this@BucksActivity, AddIncomeExpenseActivity::class.java))
+            addIncExp.putExtra(BUCKS_STRING_IS_INCOME_EXTRA, BUCKS_EXPENSE)
+            startActivity(addIncExp)
+        }
+        setSupportActionBar(bucksBinding.appBarLayout.toolbar)
 
-        setSupportActionBar(toolbar);
-        fab = findViewById(R.id.fab);
-
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        navigationView = findViewById(R.id.nav_view);
         //set first option as always checked
-        navigationView.getMenu().getItem(0).setChecked(true);
+        bucksBinding.navView.menu.getItem(0).isChecked = true
 
         //set username and email in nav header bucks
-        username = navigationView.getHeaderView(0).findViewById(R.id.tv_user_name);
-        usermail = navigationView.getHeaderView(0).findViewById(R.id.tv_user_email);
-
         //handles nullpointer exception and sets the value
-        if (user != null) {
-            for (UserInfo info : user.getProviderData()) {
-                System.out.println("Display Name is " + info.getDisplayName());
-                username.setText(info.getDisplayName());
-                usermail.setText(info.getEmail());
+        user.let { mUser ->
+            for (info in mUser.providerData) {
+                println("Display Name is " + info.displayName)
+                navHeader.tvUserName.text = info.displayName
+                navHeader.tvUserEmail.text = info.email
             }
         }
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
-        navigationView.setNavigationItemSelectedListener(this);
+        val toggle = ActionBarDrawerToggle(
+            this, bucksBinding.drawerLayout, bucksBinding.appBarLayout.toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close
+        )
+        bucksBinding.drawerLayout.addDrawerListener(toggle)
+        toggle.syncState()
+        bucksBinding.navView.setNavigationItemSelectedListener(this)
 
         //get database instance and reference
-        setTotalIncomeAndExpense();
+        setTotalIncomeAndExpense()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        //  set first option as always checked when app resumes or comes back from another activity
+        bucksBinding.navView.menu.getItem(0).isChecked = true
+        setCurrencyAndTotal(totalIncome, totalExpense)
+    }
+
+    override fun onBackPressed() {
+        if (bucksBinding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            bucksBinding.drawerLayout.closeDrawer(GravityCompat.START)
+        } else
+            super.onBackPressed()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        menuInflater.inflate(R.menu.bucks, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        /**
+         * Handle action bar item clicks here. The action bar will
+         * automatically handle clicks on the Home/Up button, so long
+         * as you specify a parent activity in AndroidManifest.xml.
+        **/
+        val intent = Intent(this@BucksActivity, BucksTransactions::class.java)
+        when (item.itemId) {
+            R.id.action_week -> {
+                intent.putExtra("WEEK", 7L)
+                startActivity(intent)
+                return true
+            }
+            R.id.action_month -> {
+                intent.putExtra("MONTH", 30L)
+                startActivity(intent)
+                return true
+            }
+            R.id.action_date_range -> {
+                startActivity(Intent(Intent(this@BucksActivity, DateChooserActivity::class.java)))
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        // Handle navigation view item clicks here.
+        when (item.itemId) {
+            R.id.nav_transactions -> startActivity(Intent(this@BucksActivity, BucksTransactions::class.java))
+            R.id.nav_categories -> startActivity(Intent(this@BucksActivity, CategoriesActivity::class.java))
+            R.id.nav_settings -> startActivity(Intent(this@BucksActivity, SettingsActivity::class.java))
+            R.id.nav_logout -> {
+                //sign out user
+                mAuth.signOut()
+                finish()
+                startActivity(Intent(this@BucksActivity, LoginActivity::class.java))
+            }
+            else -> Unit
+        }
+
+        bucksBinding.drawerLayout.closeDrawer(GravityCompat.START)
+        return true
     }
 
     //gets the total rvIncome and rvExpense from firebase
-    private void setTotalIncomeAndExpense() {
+    private fun setTotalIncomeAndExpense() {
         //  initialize categories helper class
-        final FirebaseCategoriesHelper helper = new FirebaseCategoriesHelper();
+        val helper = FirebaseCategoriesHelper()
 
         //  Get two totals one inside the other and set them to textviews
-        helper.getCategoryTotal(total1 -> helper.getCategoryTotal(total2 -> {
-            totalIncome = total1;
-            totalExpense = total2;
-            //set all the totals
-            setCurrencyAndTotal(total1, total2);
-        }, "expense"), "income");
+        helper.getCategoryTotal({ total1: Int ->
+            helper.getCategoryTotal(
+                { total2: Int ->
+                    totalIncome = total1
+                    totalExpense = total2
+                    //set all the totals
+                    setCurrencyAndTotal(total1, total2)
+                }, "expense"
+            )
+        }, "income")
     }
 
-    public void setCurrencyAndTotal(int totalIncome, int totalExpense) {
-        Resources res = getResources();
-        currencySymbol = h.getCurrencyPref("R");
-        income.setText(res.getString(R.string.currency_symbol, currencySymbol, totalIncome));
-        expense.setText(res.getString(R.string.currency_symbol, currencySymbol, totalExpense));
-        balance.setText(res.getString(R.string.currency_symbol, currencySymbol, totalIncome - totalExpense));
+    private fun setCurrencyAndTotal(totalIncome: Int, totalExpense: Int) {
+        val res = resources
+        currencySymbol = h!!.getCurrencyPref("R")
+        bucksContent.tvIncomeAmount.text = res.getString(R.string.currency_symbol, currencySymbol, totalIncome)
+        bucksContent.tvExpenseAmount.text = res.getString(R.string.currency_symbol, currencySymbol, totalExpense)
+        bucksContent.tvBalanceAmount.text = res.getString(R.string.currency_symbol, currencySymbol, totalIncome - totalExpense)
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        //  set first option as always checked when app resumes or comes back from another activity
-        navigationView.getMenu().getItem(0).setChecked(true);
-        setCurrencyAndTotal(totalIncome, totalExpense);
-    }
-
-    @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.bucks, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        Intent in = new Intent(BucksActivity.this, BucksTransactions.class);
-        //noinspection SimplifiableIfStatement
-        switch (id) {
-            case R.id.action_week:
-                in.putExtra("WEEK", 7L);
-                startActivity(in);
-                return true;
-            case R.id.action_month:
-                in.putExtra("MONTH", 30L);
-                startActivity(in);
-                return true;
-            case R.id.action_date_range:
-                startActivity(new Intent(new Intent(BucksActivity.this, DateChooserActivity.class)));
-                return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        if (id == R.id.nav_overview) {
-
-        } else if (id == R.id.nav_transactions) {
-            startActivity(new Intent(BucksActivity.this, BucksTransactions.class));
-        } else if (id == R.id.nav_categories) {
-            startActivity(new Intent(BucksActivity.this, CategoriesActivity.class));
-        } else if (id == R.id.nav_settings) {
-            startActivity(new Intent(BucksActivity.this, SettingsActivity.class));
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
-        } else if (id == R.id.nav_logout) {
-            //sign out user
-            mAuth.signOut();
-            finish();
-            startActivity(new Intent(BucksActivity.this, LoginActivity.class));
-        }
-
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
-    }
-
-    private void populateCategorySpinner() {
-        final String[] categorie = {"INCOME", "EXPENSE"};
-        ArrayAdapter<String> cats = new ArrayAdapter<>(getApplication(), android.R.layout.simple_spinner_dropdown_item, categorie);
-        categories.setAdapter(cats);
-
-        final FirebaseCategoriesHelper categoriesHelper = new FirebaseCategoriesHelper();
-        categories.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, final int position, long id) {
-
-                categoriesHelper.getCategoryTotal(total -> {
+    private fun populateCategorySpinner() {
+        val categorie = arrayOf("INCOME", "EXPENSE")
+        val cats = ArrayAdapter(application, android.R.layout.simple_spinner_dropdown_item, categorie)
+        bucksContent.spiCategoriesChoose.adapter = cats
+        val categoriesHelper = FirebaseCategoriesHelper()
+        bucksContent.spiCategoriesChoose.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View,
+                position: Int,
+                id: Long
+            ) {
+                categoriesHelper.getCategoryTotal({ total: Int ->
 //                        Log.d("abcde", "inside categories total"+total);
-                    categoriesHelper.getAllCategories(categoriesList -> getIncomeExpenseCategoriesTotal(categoriesList, total), categorie[position].toLowerCase());
-                }, categorie[position].toLowerCase());
+                    categoriesHelper.getAllCategories({ categoriesList: ArrayList<String> ->
+                        getIncomeExpenseCategoriesTotal(
+                            categoriesList,
+                            total
+                        )
+                    }, categorie[position].lowercase(Locale.getDefault()))
+                }, categorie[position].lowercase(Locale.getDefault()))
             }
 
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
     }
 
-    private void getIncomeExpenseCategoriesTotal(final ArrayList<String> cats, final int total) {
-        Query categorySalary = FirebaseDatabase.getInstance().getReference("data/" + user.getUid() + "/spendings");
-        final ArrayList<CategoriesAmount> catAmount = new ArrayList<>();
-
-        categorySalary.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                int[] amounts = new int[cats.size()];
-                int cnt = 0;
-                String[] categories;
-                categories = cats.toArray(new String[0]);
-                for (String category : categories) {
-                    for (DataSnapshot catShot : dataSnapshot.getChildren()) {
-                        if (catShot.child("category").getValue(String.class).equals(category)) {
-                            amounts[cnt] += Integer.valueOf(catShot.child("amount").getValue(String.class));
+    private fun getIncomeExpenseCategoriesTotal(cats: ArrayList<String>, total: Int) {
+        val categorySalary: Query =
+            FirebaseDatabase.getInstance().getReference("data/" + user.uid + "/spendings")
+        val catAmount = ArrayList<CategoriesAmount>()
+        categorySalary.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val amounts = IntArray(cats.size)
+                var cnt = 0
+                val categories: Array<String> = cats.toTypedArray()
+                for (category in categories) {
+                    for (catShot in dataSnapshot.children) {
+                        if (catShot.child("category").getValue(String::class.java) == category) {
+                            amounts[cnt] += Integer.valueOf(
+                                catShot.child("amount").getValue(
+                                    String::class.java
+                                )!!
+                            )
                         }
                     }
-                    catAmount.add(new CategoriesAmount(category, String.valueOf(amounts[cnt]), ((float) amounts[cnt] / total) * 100));
-                    cnt++;
+                    catAmount.add(
+                        CategoriesAmount(
+                            category, amounts[cnt].toString(), amounts[cnt]
+                                .toFloat() / total * 100
+                        )
+                    )
+                    cnt++
                 }
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    catAmount.sort((CategoriesAmount first, CategoriesAmount second) -> (int) (second.getPercentage() - first.getPercentage()));
+                    catAmount.sortWith { first: CategoriesAmount, second: CategoriesAmount -> (second.percentage - first.percentage).toInt() }
                 } else {
-                    Collections.sort(catAmount, (o1, o2) -> (int) (o2.getPercentage() - o1.getPercentage()));
+                    catAmount.sortWith { o1: CategoriesAmount, o2: CategoriesAmount -> (o2.percentage - o1.percentage).toInt() }
                 }
-                BucksOverviewRecycler overviewRecycler = new BucksOverviewRecycler(getApplicationContext(), catAmount);
-                RecyclerView.LayoutManager manager = new LinearLayoutManager(getApplicationContext());
-                rv_categories.setLayoutManager(manager);
-                rv_categories.setNestedScrollingEnabled(false);
-                rv_categories.setAdapter(overviewRecycler);
-                //  set bottom to top layout animation
-                rv_categories.setLayoutAnimation(AnimationUtils.loadLayoutAnimation(getApplicationContext(), R.anim.categorywise_card_bottom_animation));
+                val overviewRecycler = BucksOverviewRecycler(applicationContext, catAmount)
+
+                bucksContent.rvCategoriesAmount.apply {
+                    layoutManager = LinearLayoutManager(applicationContext)
+                    isNestedScrollingEnabled = true
+                    adapter = overviewRecycler
+                    layoutAnimation = AnimationUtils.loadLayoutAnimation(
+                        applicationContext, R.anim.categorywise_card_bottom_animation
+                    )
+                }
             }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
+            override fun onCancelled(databaseError: DatabaseError) = Unit
+        })
     }
 
+    companion object {
+        private const val BUCKS_INCOME = true
+        const val BUCKS_STRING_IS_INCOME_EXTRA = "income_extra"
+        private const val BUCKS_EXPENSE = false
+        const val INCOME_EXPENSE_OBJECT_EXTRA = "income_expense_extra"
+    }
 }

@@ -13,9 +13,11 @@ android {
                 storePassword '12345678'
         }
     }
-    dataBinding {
-        enabled true
+
+    buildFeatures {
+        dataBinding true
     }
+    
     compileSdkVersion 30
     defaultConfig {
         vectorDrawables {
