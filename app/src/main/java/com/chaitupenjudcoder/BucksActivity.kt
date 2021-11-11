@@ -7,7 +7,6 @@ import android.preference.PreferenceManager
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
@@ -55,7 +54,7 @@ class BucksActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelect
 
         PreferenceManager.setDefaultValues(this, R.xml.bucks_preferences, true)
         h = SharedPreferencesHelper(this)
-        BucksWidgetHelper().callIntentService(this, h!!.getWidgetOptionPref("Last Income"))
+        BucksWidgetHelper().callIntentService(this, h!!.getWidgetOptionPref("Last Income")!!)
 
 
 
@@ -256,7 +255,7 @@ class BucksActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelect
                 } else {
                     catAmount.sortWith { o1: CategoriesAmount, o2: CategoriesAmount -> (o2.percentage - o1.percentage).toInt() }
                 }
-                val overviewRecycler = BucksOverviewRecycler(applicationContext, catAmount)
+                val overviewRecycler = BucksOverviewRecycler(catAmount)
 
                 bucksContent.rvCategoriesAmount.apply {
                     layoutManager = LinearLayoutManager(applicationContext)
