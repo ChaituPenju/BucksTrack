@@ -23,7 +23,7 @@ import com.chaitupenjudcoder.datapojos.CategoriesAmount
 import com.chaitupenjudcoder.firebasehelpers.BucksWidgetHelper
 import com.chaitupenjudcoder.firebasehelpers.FirebaseCategoriesHelper
 import com.chaitupenjudcoder.firebasehelpers.SharedPreferencesHelper
-import com.chaitupenjudcoder.recyclerviews.BucksOverviewRecycler
+import com.chaitupenjudcoder.recyclerviews.BucksOverviewAdapter
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -284,7 +284,8 @@ class BucksActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelect
                 } else {
                     catAmount.sortWith { o1: CategoriesAmount, o2: CategoriesAmount -> (o2.percentage - o1.percentage).toInt() }
                 }
-                val overviewRecycler = BucksOverviewRecycler(catAmount)
+                val overviewRecycler = BucksOverviewAdapter()
+                overviewRecycler.submitList(catAmount)
 
                 bucksContent.rvCategoriesAmount.apply {
                     layoutManager = LinearLayoutManager(applicationContext)

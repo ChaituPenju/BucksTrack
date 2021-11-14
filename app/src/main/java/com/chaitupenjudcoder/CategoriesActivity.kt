@@ -88,16 +88,16 @@ class CategoriesActivity : AppCompatActivity() {
 
         CoroutineScope(Dispatchers.IO).launch {
             incExpCats.getAllCategories("income") { allCategory ->
-                setDataToAdapter(catBind.rvIncome, BucksCategoriesRecycler(allCategory))
+                setDataToAdapter(catBind.rvIncome, allCategory)
             }
 
             incExpCats.getAllCategories("expense") { allCategory ->
-                setDataToAdapter(catBind.rvExpense, BucksCategoriesRecycler(allCategory))
+                setDataToAdapter(catBind.rvExpense, allCategory)
             }
         }
     }
 
-    private suspend fun setDataToAdapter(mRv: RecyclerView, categoriesRecycler: BucksCategoriesRecycler) = withContext(Dispatchers.Main) {
-        mRv.adapter = categoriesRecycler
+    private suspend fun setDataToAdapter(mRv: RecyclerView, categoriesList: ArrayList<String>) = withContext(Dispatchers.Main) {
+        mRv.adapter = BucksCategoriesRecycler(categoriesList)
     }
 }
