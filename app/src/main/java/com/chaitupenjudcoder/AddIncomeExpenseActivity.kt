@@ -15,12 +15,16 @@ import com.chaitupenjudcoder.firebasehelpers.BucksInputValidationHelper
 import com.chaitupenjudcoder.firebasehelpers.FirebaseCategoriesHelper
 import com.chaitupenjudcoder.firebasehelpers.FirebaseTransactionsHelper
 import com.chaitupenjudcoder.firebasehelpers.SharedPreferencesHelper
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
 
 class AddIncomeExpenseActivity : AppCompatActivity() {
     private lateinit var incomeExpenseBinding: ActivityAddIncomeExpenseBinding
     private var isIncome = false
-    lateinit var BUCKS_STRING: String
+    private lateinit var BUCKS_STRING: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,19 +48,24 @@ class AddIncomeExpenseActivity : AppCompatActivity() {
         //  initialize date picker dialog with current date and update selected date
         incomeExpenseBinding.etDate.setOnClickListener { initDatePickerDialog() }
         val categoryHelper = FirebaseCategoriesHelper()
-        categoryHelper.getAllCategories({ categoriesList: ArrayList<String> ->
-            setSpinnerAdapter(
-                categoriesList
-            )
-        }, BUCKS_STRING)
+        CoroutineScope(Dispatchers.IO).launch {
+            categoryHelper.getAllCategories(BUCKS_STRING) { categoriesList: ArrayList<String> ->
+                withContext(Dispatchers.Main) {
+                    setSpinnerAdapter(
+                        categoriesList
+                    )
+                }
+            }
+        }
     }
 
     private fun setSpinnerAdapter(categoriesList: ArrayList<String>) {
-        var categorie: Array<String?>? = arrayOfNulls(categoriesList.size)
+        var categorie: Array<String?> = arrayOfNulls(categoriesList.size)
         categorie = categoriesList.toArray(categorie)
-        val cats =
-            ArrayAdapter(application, android.R.layout.simple_spinner_dropdown_item, categorie)
+        val cats = ArrayAdapter(application, android.R.layout.simple_spinner_dropdown_item, categorie)
+
         incomeExpenseBinding.spiCategories.adapter = cats
+
         if (intent.extras!!.containsKey(BucksActivity.INCOME_EXPENSE_OBJECT_EXTRA)) {
             val ie: IncomeExpense =
                 intent.getParcelableExtra(BucksActivity.INCOME_EXPENSE_OBJECT_EXTRA)!!
@@ -81,7 +90,7 @@ class AddIncomeExpenseActivity : AppCompatActivity() {
         val mDay = c[Calendar.DAY_OF_MONTH]
         val dialog = DatePickerDialog(
             this@AddIncomeExpenseActivity,
-            { view: DatePicker?, year: Int, month: Int, dayOfMonth: Int ->
+            { _: DatePicker?, year: Int, month: Int, dayOfMonth: Int ->
                 incomeExpenseBinding.etDate.setText(
                     resources.getString(R.string.date_format_string, dayOfMonth, month + 1, year)
                 )
@@ -93,7 +102,7 @@ class AddIncomeExpenseActivity : AppCompatActivity() {
         dialog.show()
     }
 
-    fun updateIncomeExpenseData(incExp: IncomeExpense?) {
+    private fun updateIncomeExpenseData(incExp: IncomeExpense?) {
         val key = incomeExpenseBinding.incExpTransac?.id!!
         val tHelper = FirebaseTransactionsHelper()
         tHelper.updateATransaction({ response: String? ->

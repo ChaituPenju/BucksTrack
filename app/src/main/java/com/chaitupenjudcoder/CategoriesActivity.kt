@@ -1,112 +1,103 @@
-package com.chaitupenjudcoder;
+package com.chaitupenjudcoder
 
-import androidx.databinding.DataBindingUtil;
-import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import android.view.View;
+import android.os.Bundle
+import android.view.View
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.chaitupenjudcoder.buckstrack.R
+import com.chaitupenjudcoder.buckstrack.databinding.ActivityCategoriesBinding
+import com.chaitupenjudcoder.buckstrack.databinding.AddCategoryCustomDialogBinding
+import com.chaitupenjudcoder.firebasehelpers.FirebaseCategoriesHelper
+import com.chaitupenjudcoder.recyclerviews.BucksCategoriesRecycler
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-import com.chaitupenjudcoder.buckstrack.R;
-import com.chaitupenjudcoder.buckstrack.databinding.ActivityCategoriesBinding;
-import com.chaitupenjudcoder.buckstrack.databinding.AddCategoryCustomDialogBinding;
-import com.chaitupenjudcoder.firebasehelpers.FirebaseCategoriesHelper;
-import com.chaitupenjudcoder.recyclerviews.BucksCategoriesRecycler;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
+class CategoriesActivity : AppCompatActivity() {
+    lateinit var catBind: ActivityCategoriesBinding
+    lateinit var addCategoryBind: AddCategoryCustomDialogBinding
+    var mUser: FirebaseUser? = null
+    var incomeExpenseRef: DatabaseReference? = null
+    private var addCategoryRef: DatabaseReference? = null
 
-public class CategoriesActivity extends AppCompatActivity {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
-    ActivityCategoriesBinding catBind;
-    AddCategoryCustomDialogBinding addCategoryBind;
+        catBind = DataBindingUtil.setContentView(this, R.layout.activity_categories)
+        mUser = FirebaseAuth.getInstance().currentUser
 
-    FirebaseUser mUser;
-    DatabaseReference incomeExpenseRef, addCategoryRef;
-
-    RecyclerView rvIncome, rvExpense;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        catBind = DataBindingUtil.setContentView(this, R.layout.activity_categories);
-
-        mUser = FirebaseAuth.getInstance().getCurrentUser();
-        String userId = "";
+        var userId = ""
         if (mUser != null) {
-            userId = mUser.getUid();
+            userId = mUser!!.uid
         }
 
-        incomeExpenseRef = FirebaseDatabase.getInstance().getReference("data/" + userId + "/categories");
+        incomeExpenseRef = FirebaseDatabase.getInstance().getReference("data/$userId/categories")
 
         //retrieve the list of rvIncome and rvExpense categories
-        getIncomeExpenseCategories();
+        incomeExpenseCategories()
 
-        rvIncome = catBind.rvIncome;
-        rvExpense = catBind.rvExpense;
-
-        //create and set layout manager for each RecyclerView
-        RecyclerView.LayoutManager firstLayoutManager = new LinearLayoutManager(this);
-        RecyclerView.LayoutManager secondLayoutManager = new LinearLayoutManager(this);
-
-        rvIncome.setLayoutManager(firstLayoutManager);
-        rvExpense.setLayoutManager(secondLayoutManager);
-
-        initIncomeExpenseButtons();
-
+        registerIncomeExpenseButtons()
     }
 
     //  initialize/set on click functionality for rvIncome and rvExpense adding buttons
-    public void initIncomeExpenseButtons() {
-        catBind.btnAddIncomeCategory.setOnClickListener(v -> initCategoryAddCustomDialog("Income"));
+    private fun registerIncomeExpenseButtons() {
+        catBind.btnAddIncomeCategory.setOnClickListener {
+            initCategoryAddCustomDialog("Income")
+        }
 
-        catBind.btnAddExpenseCategory.setOnClickListener(v -> initCategoryAddCustomDialog("Expense"));
+        catBind.btnAddExpenseCategory.setOnClickListener {
+            initCategoryAddCustomDialog("Expense")
+        }
     }
 
-    public void initCategoryAddCustomDialog(final String type) {
-        addCategoryBind = AddCategoryCustomDialogBinding.inflate(getLayoutInflater());
+    private fun initCategoryAddCustomDialog(type: String) {
+        addCategoryBind = AddCategoryCustomDialogBinding.inflate(layoutInflater)
 
-        AlertDialog.Builder catAddBuilder = new AlertDialog.Builder(CategoriesActivity.this);
-        addCategoryBind.setCategoryType(type);
-        View mView = addCategoryBind.getRoot();
+        val addCatDialog = AlertDialog.Builder(this@CategoriesActivity)
+            .setView(addCategoryBind.also { it.categoryType = type }.root)
+            .create()
 
-        catAddBuilder.setView(mView);
+        addCategoryBind.btnCategoryCancel.setOnClickListener { addCatDialog.dismiss() }
+        addCategoryBind.btnCategoryOk.setOnClickListener {
+            val category = addCategoryBind.etAddCategory.text.toString()
+            addIncomeExpenseCategory(type, category)
+            addCatDialog.dismiss()
+        }
 
-        final AlertDialog addCatDialog = catAddBuilder.create();
-        addCatDialog.setCanceledOnTouchOutside(true);
+        addCatDialog.setCanceledOnTouchOutside(true)
 
-        addCategoryBind.btnCategoryCancel.setOnClickListener(v -> addCatDialog.dismiss());
-
-        addCategoryBind.btnCategoryOk.setOnClickListener(v -> {
-            String category = addCategoryBind.etAddCategory.getText().toString();
-            addIncomeExpenseCategory(type, category);
-            addCatDialog.dismiss();
-        });
-
-        addCatDialog.show();
+        addCatDialog.show()
     }
 
     //  adding category to corresponding child(rvIncome/rvExpense) on button click
-    public void addIncomeExpenseCategory(String type, String category) {
-        addCategoryRef = FirebaseDatabase.getInstance().getReference("data/" + mUser.getUid() + "/categories/" + type);
-        addCategoryRef.push().setValue(category);
+    private fun addIncomeExpenseCategory(type: String, category: String?) {
+        addCategoryRef = FirebaseDatabase.getInstance().getReference("data/" + mUser!!.uid + "/categories/" + type)
+        addCategoryRef!!.push().setValue(category)
     }
 
-    private void getIncomeExpenseCategories() {
-        FirebaseCategoriesHelper incExpCats1 = new FirebaseCategoriesHelper();
-        FirebaseCategoriesHelper incExpCats2 = new FirebaseCategoriesHelper();
+    private fun incomeExpenseCategories() {
+        val incExpCats = FirebaseCategoriesHelper()
 
-        incExpCats1.getAllCategories((allCategory) -> {
-            BucksCategoriesRecycler firstAdapter = new BucksCategoriesRecycler(allCategory);
-            rvIncome.setAdapter(firstAdapter);
-        }, "income");
+        CoroutineScope(Dispatchers.IO).launch {
+            incExpCats.getAllCategories("income") { allCategory ->
+                setDataToAdapter(catBind.rvIncome, BucksCategoriesRecycler(allCategory))
+            }
 
-        incExpCats2.getAllCategories((allCategory) -> {
-            BucksCategoriesRecycler firstAdapter = new BucksCategoriesRecycler(allCategory);
-            rvExpense.setAdapter(firstAdapter);
-        }, "expense");
+            incExpCats.getAllCategories("expense") { allCategory ->
+                setDataToAdapter(catBind.rvExpense, BucksCategoriesRecycler(allCategory))
+            }
+        }
+    }
+
+    private suspend fun setDataToAdapter(mRv: RecyclerView, categoriesRecycler: BucksCategoriesRecycler) = withContext(Dispatchers.Main) {
+        mRv.adapter = categoriesRecycler
     }
 }

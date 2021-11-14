@@ -28,6 +28,10 @@ import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
 
 class BucksActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
@@ -55,7 +59,6 @@ class BucksActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelect
         PreferenceManager.setDefaultValues(this, R.xml.bucks_preferences, true)
         h = SharedPreferencesHelper(this)
         BucksWidgetHelper().callIntentService(this, h!!.getWidgetOptionPref("Last Income")!!)
-
 
 
         //get Firebase authentication instance and user
@@ -95,7 +98,11 @@ class BucksActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelect
             }
         }
         val toggle = ActionBarDrawerToggle(
-            this, bucksBinding.drawerLayout, bucksBinding.appBarLayout.toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close
+            this,
+            bucksBinding.drawerLayout,
+            bucksBinding.appBarLayout.toolbar,
+            R.string.navigation_drawer_open,
+            R.string.navigation_drawer_close
         )
         bucksBinding.drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
@@ -109,7 +116,9 @@ class BucksActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelect
         super.onResume()
         //  set first option as always checked when app resumes or comes back from another activity
         bucksBinding.navView.menu.getItem(0).isChecked = true
-        setCurrencyAndTotal(totalIncome, totalExpense)
+        CoroutineScope(Dispatchers.IO).launch {
+            setCurrencyAndTotal(totalIncome, totalExpense)
+        }
     }
 
     override fun onBackPressed() {
@@ -130,7 +139,7 @@ class BucksActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelect
          * Handle action bar item clicks here. The action bar will
          * automatically handle clicks on the Home/Up button, so long
          * as you specify a parent activity in AndroidManifest.xml.
-        **/
+         **/
         val intent = Intent(this@BucksActivity, BucksTransactions::class.java)
         when (item.itemId) {
             R.id.action_week -> {
@@ -154,9 +163,24 @@ class BucksActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelect
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         // Handle navigation view item clicks here.
         when (item.itemId) {
-            R.id.nav_transactions -> startActivity(Intent(this@BucksActivity, BucksTransactions::class.java))
-            R.id.nav_categories -> startActivity(Intent(this@BucksActivity, CategoriesActivity::class.java))
-            R.id.nav_settings -> startActivity(Intent(this@BucksActivity, SettingsActivity::class.java))
+            R.id.nav_transactions -> startActivity(
+                Intent(
+                    this@BucksActivity,
+                    BucksTransactions::class.java
+                )
+            )
+            R.id.nav_categories -> startActivity(
+                Intent(
+                    this@BucksActivity,
+                    CategoriesActivity::class.java
+                )
+            )
+            R.id.nav_settings -> startActivity(
+                Intent(
+                    this@BucksActivity,
+                    SettingsActivity::class.java
+                )
+            )
             R.id.nav_logout -> {
                 //sign out user
                 mAuth.signOut()
@@ -176,19 +200,20 @@ class BucksActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelect
         val helper = FirebaseCategoriesHelper()
 
         //  Get two totals one inside the other and set them to textviews
-        helper.getCategoryTotal({ total1: Int ->
-            helper.getCategoryTotal(
-                { total2: Int ->
+        CoroutineScope(Dispatchers.IO).launch {
+            helper.getCategoryTotal("income") { total1: Int ->
+                helper.getCategoryTotal("expense") { total2: Int ->
                     totalIncome = total1
                     totalExpense = total2
                     //set all the totals
                     setCurrencyAndTotal(total1, total2)
-                }, "expense"
-            )
-        }, "income")
+                }
+            }
+        }
     }
 
-    private fun setCurrencyAndTotal(totalIncome: Int, totalExpense: Int) {
+
+    private suspend fun setCurrencyAndTotal(totalIncome: Int, totalExpense: Int) = withContext(Dispatchers.Main) {
         val res = resources
         currencySymbol = h!!.getCurrencyPref("R")
         bucksContent.tvIncomeAmount.text = res.getString(R.string.currency_symbol, currencySymbol, totalIncome)
@@ -198,29 +223,33 @@ class BucksActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelect
 
     private fun populateCategorySpinner() {
         val categorie = arrayOf("INCOME", "EXPENSE")
-        val cats = ArrayAdapter(application, android.R.layout.simple_spinner_dropdown_item, categorie)
+        val cats =
+            ArrayAdapter(application, android.R.layout.simple_spinner_dropdown_item, categorie)
         bucksContent.spiCategoriesChoose.adapter = cats
         val categoriesHelper = FirebaseCategoriesHelper()
-        bucksContent.spiCategoriesChoose.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                parent: AdapterView<*>?,
-                view: View,
-                position: Int,
-                id: Long
-            ) {
-                categoriesHelper.getCategoryTotal({ total: Int ->
+        bucksContent.spiCategoriesChoose.onItemSelectedListener =
+            object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View,
+                    position: Int,
+                    id: Long
+                ) {
+                    CoroutineScope(Dispatchers.Main).launch {
+                        categoriesHelper.getCategoryTotal(categorie[position].lowercase(Locale.getDefault())) { total: Int ->
 //                        Log.d("abcde", "inside categories total"+total);
-                    categoriesHelper.getAllCategories({ categoriesList: ArrayList<String> ->
-                        getIncomeExpenseCategoriesTotal(
-                            categoriesList,
-                            total
-                        )
-                    }, categorie[position].lowercase(Locale.getDefault()))
-                }, categorie[position].lowercase(Locale.getDefault()))
-            }
+                            categoriesHelper.getAllCategories(categorie[position].lowercase(Locale.getDefault())) { categoriesList: ArrayList<String> ->
+                                getIncomeExpenseCategoriesTotal(
+                                    categoriesList,
+                                    total
+                                )
+                            }
+                        }
+                    }
+                }
 
-            override fun onNothingSelected(parent: AdapterView<*>?) {}
-        }
+                override fun onNothingSelected(parent: AdapterView<*>?) {}
+            }
     }
 
     private fun getIncomeExpenseCategoriesTotal(cats: ArrayList<String>, total: Int) {

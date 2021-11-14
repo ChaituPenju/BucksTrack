@@ -14,41 +14,41 @@ class BucksWidgetHelper {
     var tHelper = FirebaseTransactionsHelper()
 
     fun callIntentService(cxt: Context, message: String) {
-        val appWidgetManager = AppWidgetManager.getInstance(cxt)
-        val thisWidget = ComponentName(cxt, BucksTrackWidget::class.java)
-        val intent = Intent(cxt, BucksIntentService::class.java)
-        val allWidgetIds = appWidgetManager.getAppWidgetIds(thisWidget)
-        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, allWidgetIds)
-        Log.e("BABA", message)
-        if (message == "Last Income") {
-            tHelper.getALastTransaction({ transaction: IncomeExpense? ->
-                helper.getCategoryTotal(
-                    { total1: Int ->
-                        helper.getCategoryTotal({ total: Int ->
-                            intent.putExtra(BALANCE_EXTRA, total - total1)
-                            intent.putExtra(INCOME_EXTRA, total)
-                            intent.putExtra(EXPENSE_EXTRA, total1)
-                            intent.putExtra("message", transaction)
-                            cxt.startService(intent)
-                        }, "income")
-                    }, "expense"
-                )
-            }, "income")
-        } else if (message == "Last Expense") {
-            tHelper.getALastTransaction({ transaction: IncomeExpense? ->
-                helper.getCategoryTotal(
-                    { total1: Int ->
-                        helper.getCategoryTotal({ total: Int ->
-                            intent.putExtra(BALANCE_EXTRA, total - total1)
-                            intent.putExtra(INCOME_EXTRA, total)
-                            intent.putExtra(EXPENSE_EXTRA, total1)
-                            intent.putExtra("message", transaction)
-                            cxt.startService(intent)
-                        }, "income")
-                    }, "expense"
-                )
-            }, "expense")
-        }
+//        val appWidgetManager = AppWidgetManager.getInstance(cxt)
+//        val thisWidget = ComponentName(cxt, BucksTrackWidget::class.java)
+//        val intent = Intent(cxt, BucksIntentService::class.java)
+//        val allWidgetIds = appWidgetManager.getAppWidgetIds(thisWidget)
+//        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, allWidgetIds)
+//        Log.e("BABA", message)
+//        if (message == "Last Income") {
+//            tHelper.getALastTransaction({ transaction: IncomeExpense? ->
+//                helper.getCategoryTotal(
+//                    { total1: Int ->
+//                        helper.getCategoryTotal({ total: Int ->
+//                            intent.putExtra(BALANCE_EXTRA, total - total1)
+//                            intent.putExtra(INCOME_EXTRA, total)
+//                            intent.putExtra(EXPENSE_EXTRA, total1)
+//                            intent.putExtra("message", transaction)
+//                            cxt.startService(intent)
+//                        }, "income")
+//                    }, "expense"
+//                )
+//            }, "income")
+//        } else if (message == "Last Expense") {
+//            tHelper.getALastTransaction({ transaction: IncomeExpense? ->
+//                helper.getCategoryTotal(
+//                    { total1: Int ->
+//                        helper.getCategoryTotal({ total: Int ->
+//                            intent.putExtra(BALANCE_EXTRA, total - total1)
+//                            intent.putExtra(INCOME_EXTRA, total)
+//                            intent.putExtra(EXPENSE_EXTRA, total1)
+//                            intent.putExtra("message", transaction)
+//                            cxt.startService(intent)
+//                        }, "income")
+//                    }, "expense"
+//                )
+//            }, "expense")
+//        }
     }
 
     companion object {
