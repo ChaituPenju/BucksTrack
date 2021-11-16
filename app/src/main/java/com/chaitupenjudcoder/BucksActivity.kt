@@ -14,7 +14,6 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.databinding.DataBindingUtil
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.chaitupenjudcoder.buckstrack.R
 import com.chaitupenjudcoder.buckstrack.databinding.ActivityBucksBinding
 import com.chaitupenjudcoder.buckstrack.databinding.ContentBucksBinding
@@ -31,6 +30,7 @@ import com.google.firebase.database.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.util.*
 
@@ -213,13 +213,17 @@ class BucksActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelect
     }
 
 
-    private suspend fun setCurrencyAndTotal(totalIncome: Int, totalExpense: Int) = withContext(Dispatchers.Main) {
-        val res = resources
-        currencySymbol = h!!.getCurrencyPref("R")
-        bucksContent.tvIncomeAmount.text = res.getString(R.string.currency_symbol, currencySymbol, totalIncome)
-        bucksContent.tvExpenseAmount.text = res.getString(R.string.currency_symbol, currencySymbol, totalExpense)
-        bucksContent.tvBalanceAmount.text = res.getString(R.string.currency_symbol, currencySymbol, totalIncome - totalExpense)
-    }
+    private suspend fun setCurrencyAndTotal(totalIncome: Int, totalExpense: Int) =
+        withContext(Dispatchers.Main) {
+            val res = resources
+            currencySymbol = h!!.getCurrencyPref("R")
+            bucksContent.tvIncomeAmount.text =
+                res.getString(R.string.currency_symbol, currencySymbol, totalIncome)
+            bucksContent.tvExpenseAmount.text =
+                res.getString(R.string.currency_symbol, currencySymbol, totalExpense)
+            bucksContent.tvBalanceAmount.text =
+                res.getString(R.string.currency_symbol, currencySymbol, totalIncome - totalExpense)
+        }
 
     private fun populateCategorySpinner() {
         val categorie = arrayOf("INCOME", "EXPENSE")
@@ -252,53 +256,49 @@ class BucksActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelect
             }
     }
 
-    private fun getIncomeExpenseCategoriesTotal(cats: ArrayList<String>, total: Int) {
-        val categorySalary: Query =
-            FirebaseDatabase.getInstance().getReference("data/" + user.uid + "/spendings")
-        val catAmount = ArrayList<CategoriesAmount>()
-        categorySalary.addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val amounts = IntArray(cats.size)
-                var cnt = 0
-                val categories: Array<String> = cats.toTypedArray()
-                for (category in categories) {
-                    for (catShot in dataSnapshot.children) {
-                        if (catShot.child("category").getValue(String::class.java) == category) {
-                            amounts[cnt] += Integer.valueOf(
-                                catShot.child("amount").getValue(
-                                    String::class.java
-                                )!!
-                            )
-                        }
-                    }
-                    catAmount.add(
-                        CategoriesAmount(
-                            category, amounts[cnt].toString(), amounts[cnt]
-                                .toFloat() / total * 100
-                        )
-                    )
-                    cnt++
-                }
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    catAmount.sortWith { first: CategoriesAmount, second: CategoriesAmount -> (second.percentage - first.percentage).toInt() }
-                } else {
-                    catAmount.sortWith { o1: CategoriesAmount, o2: CategoriesAmount -> (o2.percentage - o1.percentage).toInt() }
-                }
-                val overviewRecycler = BucksOverviewAdapter()
-                overviewRecycler.submitList(catAmount)
+    private fun getIncomeExpenseCategoriesTotal(cats: ArrayList<String>, total: Int) = CoroutineScope(Dispatchers.IO).launch {
+        val spendingSnapshot =
+            FirebaseDatabase.getInstance().getReference("data/" + user.uid + "/spendings").get().await()
 
-                bucksContent.rvCategoriesAmount.apply {
-                    layoutManager = LinearLayoutManager(applicationContext)
-                    isNestedScrollingEnabled = true
-                    adapter = overviewRecycler
-                    layoutAnimation = AnimationUtils.loadLayoutAnimation(
-                        applicationContext, R.anim.categorywise_card_bottom_animation
+        val catAmount = ArrayList<CategoriesAmount>()
+
+        val amounts = IntArray(cats.size)
+        val categories: Array<String> = cats.toTypedArray()
+
+        for ((cnt, category) in categories.withIndex()) {
+            for (catShot in spendingSnapshot.children) {
+                if (catShot.child("category").getValue(String::class.java) == category) {
+                    amounts[cnt] += Integer.valueOf(
+                        catShot.child("amount").getValue(
+                            String::class.java
+                        )!!
                     )
                 }
             }
+            catAmount.add(
+                CategoriesAmount(
+                    category, amounts[cnt].toString(), amounts[cnt]
+                        .toFloat() / total * 100
+                )
+            )
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            catAmount.sortWith { first: CategoriesAmount, second: CategoriesAmount -> (second.percentage - first.percentage).toInt() }
+        } else {
+            catAmount.sortWith { o1: CategoriesAmount, o2: CategoriesAmount -> (o2.percentage - o1.percentage).toInt() }
+        }
+        val overviewRecycler = BucksOverviewAdapter()
+        overviewRecycler.submitList(catAmount)
 
-            override fun onCancelled(databaseError: DatabaseError) = Unit
-        })
+        withContext(Dispatchers.Main) {
+            bucksContent.rvCategoriesAmount.apply {
+                adapter = overviewRecycler
+                layoutAnimation = AnimationUtils.loadLayoutAnimation(
+                    applicationContext, R.anim.categorywise_card_bottom_animation
+                )
+            }
+        }
+
     }
 
     companion object {

@@ -11,7 +11,14 @@ import com.chaitupenjudcoder.buckstrack.databinding.ItemCategoryTotalListBinding
 import com.chaitupenjudcoder.datapojos.CategoriesAmount
 import kotlin.math.roundToInt
 
-class BucksOverviewAdapter: ListAdapter<CategoriesAmount, BucksOverviewAdapter.BucksOverviewHolder>(overviewCallback) {
+class BucksOverviewAdapter : ListAdapter<CategoriesAmount, BucksOverviewAdapter.BucksOverviewHolder>
+    (object : DiffUtil.ItemCallback<CategoriesAmount>() {
+    override fun areItemsTheSame(oldItem: CategoriesAmount, newItem: CategoriesAmount) =
+        oldItem.categoryName == newItem.categoryName
+
+    override fun areContentsTheSame(oldItem: CategoriesAmount, newItem: CategoriesAmount) =
+        oldItem.toString() == newItem.toString()
+}) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = BucksOverviewHolder(
         DataBindingUtil.inflate(
@@ -24,7 +31,7 @@ class BucksOverviewAdapter: ListAdapter<CategoriesAmount, BucksOverviewAdapter.B
         holder.bind(getItem(position))
     }
 
-    inner class BucksOverviewHolder(private val itemViewBinding: ItemCategoryTotalListBinding):
+    inner class BucksOverviewHolder(private val itemViewBinding: ItemCategoryTotalListBinding) :
         RecyclerView.ViewHolder(itemViewBinding.root) {
 
         fun bind(catAmount: CategoriesAmount) {
@@ -39,12 +46,3 @@ class BucksOverviewAdapter: ListAdapter<CategoriesAmount, BucksOverviewAdapter.B
     }
 }
 
-private val overviewCallback = object : DiffUtil.ItemCallback<CategoriesAmount>() {
-    override fun areItemsTheSame(oldItem: CategoriesAmount, newItem: CategoriesAmount
-    ) = oldItem.categoryName == newItem.categoryName
-
-    override fun areContentsTheSame(
-        oldItem: CategoriesAmount,
-        newItem: CategoriesAmount
-    ) = oldItem.toString() == newItem.toString()
-}
