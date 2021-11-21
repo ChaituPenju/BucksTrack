@@ -7,7 +7,7 @@ BucksTrack is an Android Application to track all the expenses of money on the g
 
 - For application planning, features, screens, etc refer to these [Capstone_Stage1.pdf](https://raw.githubusercontent.com/ChaituPenju/BucksTrack/master/Capstone_Stage1.pdf) or [Udacity_capstone_stage_1.docx](https://raw.githubusercontent.com/ChaituPenju/BucksTrack/master/Udacity_capstone_stage_1.docx)
 
-- For UI mocks, Refer [here](https://github.com/ChaituPenju/BucksTrack/tree/adding-app-mocks/app-mocks)
+- For UI mocks, Refer [here](https://github.com/ChaituPenju/BucksTrack/tree/adding-app-mocks/app-mocks#buckstrack-design-ui-mocks)
 
 - The datastructure [json](https://raw.githubusercontent.com/ChaituPenju/BucksTrack/master/buckstrack_datastructure.json) of app's data for firebase realtime database.
 
